@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-personas": "node scripts/download-personas.mjs"
   },
   "dependencies": {
     "echarts": "^6.0.0",

@@ -3,6 +3,11 @@ import type { BaziInfo } from '../types'
 const TIAN_GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
 const DI_ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
 const WU_XING = ['木', '木', '火', '火', '土', '土', '金', '金', '水', '水']
+const ZHI_WUXING: Record<string, string> = {
+  '子': '水', '丑': '土', '寅': '木', '卯': '木',
+  '辰': '土', '巳': '火', '午': '火', '未': '土',
+  '申': '金', '酉': '金', '戌': '土', '亥': '水',
+}
 const ZANG_GAN: Record<string, string[]> = {
   '子': ['癸'], '丑': ['己', '癸', '辛'], '寅': ['甲', '丙', '戊'],
   '卯': ['乙'], '辰': ['戊', '乙', '癸'], '巳': ['丙', '庚', '戊'],
@@ -32,11 +37,36 @@ function getYearGanZhi(year: number): [string, string] {
   return [gan, zhi]
 }
 
-function getMonthGanZhi(year: number, month: number): [string, string] {
+function getBaziMonthZhiIdx(month: number, day: number): number {
+  const boundaries: { month: number; day: number; zhiIdx: number }[] = [
+    { month: 1, day: 6, zhiIdx: 1 },
+    { month: 2, day: 4, zhiIdx: 2 },
+    { month: 3, day: 6, zhiIdx: 3 },
+    { month: 4, day: 5, zhiIdx: 4 },
+    { month: 5, day: 6, zhiIdx: 5 },
+    { month: 6, day: 6, zhiIdx: 6 },
+    { month: 7, day: 7, zhiIdx: 7 },
+    { month: 8, day: 7, zhiIdx: 8 },
+    { month: 9, day: 8, zhiIdx: 9 },
+    { month: 10, day: 8, zhiIdx: 10 },
+    { month: 11, day: 7, zhiIdx: 11 },
+    { month: 12, day: 7, zhiIdx: 0 },
+  ]
+  for (let i = boundaries.length - 1; i >= 0; i--) {
+    const b = boundaries[i]
+    if (month > b.month || (month === b.month && day >= b.day)) {
+      return b.zhiIdx
+    }
+  }
+  return 0
+}
+
+function getMonthGanZhi(year: number, month: number, day: number): [string, string] {
   const yearGan = ((year - 4) % 10 + 10) % 10
   const monthGanStart = ((yearGan % 5) * 2 + 2) % 10
-  const ganIdx = ((monthGanStart + month - 1) % 10 + 10) % 10
-  const zhiIdx = ((month + 1) % 12 + 12) % 12
+  const zhiIdx = getBaziMonthZhiIdx(month, day)
+  const baziMonthOffset = (zhiIdx - 2 + 12) % 12
+  const ganIdx = ((monthGanStart + baziMonthOffset) % 10 + 10) % 10
   return [TIAN_GAN[ganIdx], DI_ZHI[zhiIdx]]
 }
 
@@ -87,7 +117,7 @@ function getCouplePalace(dayBranch: string): string {
 
 function getPillarInterpretation(stem: string, branch: string, pillarIndex: number): string {
   const stemWuxing = WU_XING[TIAN_GAN.indexOf(stem)]
-  const branchWuxing = WU_XING[DI_ZHI.indexOf(branch) % 5]
+  const branchWuxing = ZHI_WUXING[branch] || '土'
   const zangGans = ZANG_GAN[branch] || []
   const zangWuxing = zangGans.map(g => WU_XING[TIAN_GAN.indexOf(g)])
 
@@ -173,7 +203,7 @@ export interface EnhancedBaziInfo extends BaziInfo {
 
 export function calculateBazi(year: number, month: number, day: number, hour: number | null): BaziInfo {
   const [yGan, yZhi] = getYearGanZhi(year)
-  const [mGan, mZhi] = getMonthGanZhi(year, month)
+  const [mGan, mZhi] = getMonthGanZhi(year, month, day)
   const [dGan, dZhi] = getDayGanZhi(year, month, day)
 
   const effectiveHour = hour !== null ? hour : 12

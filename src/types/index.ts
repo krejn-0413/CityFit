@@ -41,6 +41,14 @@ export interface City {
   baziPreference: string[]
 }
 
+export interface CityPersonality {
+  tag: string
+  emoji: string
+  color: string
+  description: string
+  imagePrompt: string
+}
+
 export interface CityResult {
   city: City
   matchPercentage: number
@@ -57,9 +65,13 @@ export interface BaziInfo {
   couplePalace: string
 }
 
-export interface FriendRecommendation {
+export interface SharedUserData {
   name: string
-  cityName: string
-  avatar: string
-  color: string
+  private: boolean
+  teamId: string
+  results: {
+    cityId: string
+    cityName: string
+    matchPercentage: number
+  }[]
 }
