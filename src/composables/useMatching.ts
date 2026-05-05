@@ -33,6 +33,21 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
   })
 
   const maxScore = Math.max(...Object.values(scores))
+
+  if (maxScore <= 0) {
+    return {
+      topResults: cities.slice(0, 3).map((city) => ({
+        city,
+        matchPercentage: 0,
+        matchType: 'general' as const,
+        personalityTag: '城市探索家',
+      })),
+      personalityTag: '城市探索家',
+      allScores: Object.fromEntries(cities.map((c) => [c.id, 0])),
+      baziInfo,
+    }
+  }
+
   const normalizedScores: Record<string, number> = {}
   Object.entries(scores).forEach(([cityId, score]) => {
     normalizedScores[cityId] = Math.round((score / maxScore) * 100)
@@ -43,7 +58,7 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
       const matchCount = city.baziPreference.filter((elem) =>
         baziInfo.likes.includes(elem)
       ).length
-      normalizedScores[city.id] = Math.min(100, normalizedScores[city.id] + matchCount * 5)
+      normalizedScores[city.id] += matchCount * 5
     })
   }
 
@@ -62,6 +77,10 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
       }
     })
   }
+
+  Object.keys(normalizedScores).forEach((id) => {
+    normalizedScores[id] = Math.min(100, Math.max(0, normalizedScores[id]))
+  })
 
   const sorted = Object.entries(normalizedScores)
     .sort(([, a], [, b]) => b - a)
