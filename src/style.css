@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: rgba(255, 107, 107, 0.2);
+    color: #333;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl rounded-3xl shadow-lg border border-white/50;
+  }
+
+  .glass-card-strong {
+    @apply bg-white/85 backdrop-blur-xl rounded-3xl shadow-xl border border-white/60;
+  }
+
+  .section-block-primary {
+    @apply bg-gradient-to-br from-primary-pale via-white to-primary-pale rounded-3xl p-6;
+  }
+
+  .section-block-secondary {
+    @apply bg-gradient-to-br from-secondary-pale via-white to-secondary-pale rounded-3xl p-6;
+  }
+
+  .section-block-accent {
+    @apply bg-gradient-to-br from-accent-pale via-white to-accent-pale rounded-3xl p-6;
+  }
+
+  .section-block-yellow {
+    @apply bg-gradient-to-br from-bright-yellow-pale via-white to-bright-yellow-pale rounded-3xl p-6;
+  }
+
+  .section-block-green {
+    @apply bg-gradient-to-br from-light-green-pale via-white to-light-green-pale rounded-3xl p-6;
+  }
+
+  .section-block-purple {
+    @apply bg-gradient-to-br from-purple-pale via-white to-purple-pale rounded-3xl p-6;
+  }
+
+  .pill-button {
+    @apply px-6 py-3 rounded-full font-bold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+  }
+
+  .score-bar {
+    @apply h-2.5 rounded-full bg-gray-100 overflow-hidden;
+  }
+
+  .score-bar-fill {
+    @apply h-full rounded-full transition-all duration-700 ease-out;
+  }
+
+  .deco-dot {
+    @apply w-1.5 h-1.5 rounded-full opacity-30;
+  }
+}
