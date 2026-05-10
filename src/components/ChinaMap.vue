@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps<{
   topCities: { name: string; value: number; color?: string }[]
@@ -93,7 +93,6 @@ const emit = defineEmits<{
   cityClick: [name: string]
 }>()
 
-const mapContainerRef = ref<HTMLDivElement>()
 const mapState = ref<'loading' | 'ready' | 'error'>('loading')
 const errorMessage = ref('')
 const hoveredCity = ref<string | null>(null)

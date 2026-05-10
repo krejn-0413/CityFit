@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="card-overlay">
-      <div v-if="visible" class="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-4"
+      <div v-if="visible && city" class="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-4"
         @click.self="close">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
@@ -43,7 +43,7 @@
             <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4" style="scrollbar-width: thin;">
 
               <div class="flex items-center gap-3">
-                <div v-if="matchPercentage > 0" class="flex-1 bg-white/50 rounded-2xl px-4 py-3 text-center">
+                <div v-if="(matchPercentage ?? 0) > 0" class="flex-1 bg-white/50 rounded-2xl px-4 py-3 text-center">
                   <div class="text-2xl font-bold font-display" :style="{ color: personalityColor }">
                     {{ matchPercentage }}%
                   </div>
