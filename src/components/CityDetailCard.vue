@@ -184,7 +184,7 @@ const personalityDesc = computed(() => personality.value?.description || '')
 
 const personaAssetSrc = computed(() => {
   if (!props.city) return ''
-  return `/assets/personas/${props.city.id}.png`
+  return `${import.meta.env.BASE_URL}assets/personas/${props.city.id}.png`
 })
 
 const cardGradient = computed(() => {

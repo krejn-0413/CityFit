@@ -491,7 +491,7 @@ const personalityEmoji = computed(() => {
 
 const personalityAssetSrc = computed(() => {
   const topCity = topResults.value[0]?.city
-  return topCity ? `/assets/personas/${topCity.id}.png` : ''
+  return topCity ? `${import.meta.env.BASE_URL}assets/personas/${topCity.id}.png` : ''
 })
 
 const radarScores = computed(() => {

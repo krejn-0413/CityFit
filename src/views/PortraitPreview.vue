@@ -24,7 +24,7 @@
               :style="{ boxShadow: '0 0 30px ' + personality.color + '20' }"
             >
               <CityPersonaImage
-                :asset-src="`/assets/personas/${city.id}.png`"
+                :asset-src="`${baseUrl}assets/personas/${city.id}.png`"
                 :city-name="city.name"
                 :color="personality.color"
                 :tag="personality.tag"
@@ -49,6 +49,8 @@ import { computed } from 'vue'
 import CityPersonaImage from '../components/CityPersonaImage.vue'
 import { cities, cityPersonalities } from '../data/cities'
 import type { CityPersonality } from '../types'
+
+const baseUrl = import.meta.env.BASE_URL
 
 const totalCities = computed(() => cities.length)
 const totalPortraits = computed(() => Object.values(cityPersonalities).flat().length)

@@ -49,7 +49,7 @@
               :style="{ backgroundColor: point.color + '15' }"></div>
 
             <img v-if="point.rank <= 3"
-              :src="'/assets/flag' + point.rank + '.svg'"
+              :src="`${baseUrl}assets/flag${point.rank}.svg`"
               class="relative z-10 transition-transform duration-200 group-hover:scale-110"
               :class="point.rank === 1 ? 'w-8 h-8' : point.rank === 2 ? 'w-7 h-7' : 'w-6 h-6'"
             />
@@ -96,7 +96,8 @@ const emit = defineEmits<{
 const mapState = ref<'loading' | 'ready' | 'error'>('loading')
 const errorMessage = ref('')
 const hoveredCity = ref<string | null>(null)
-const mapSvgUrl = '/assets/converteverything.io-d4Bqj5E6b3.svg'
+const baseUrl = import.meta.env.BASE_URL
+const mapSvgUrl = baseUrl + 'assets/converteverything.io-d4Bqj5E6b3.svg'
 
 const mergedPointsLength = computed(() => props.mergedPoints?.length || 0)
 
