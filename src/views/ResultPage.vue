@@ -73,7 +73,6 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
-                <span class="text-2xl">{{ r.city.emoji }}</span>
                 <span class="text-lg font-bold text-gray-800">{{ r.city.name }}</span>
                 <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ r.city.province }}</span>
               </div>
@@ -110,8 +109,9 @@
 
         <div class="flex items-stretch justify-center gap-3 mb-4">
           <div v-for="(r, idx) in topResults" :key="r.city.id"
-            class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 bg-white/70 rounded-2xl px-2.5 py-3 shadow-sm border relative overflow-hidden"
+            class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 bg-white/70 rounded-2xl px-2.5 py-3 shadow-sm border relative overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
             :class="idx === 0 ? 'border-primary/40' : idx === 1 ? 'border-secondary/40' : 'border-accent/40'"
+            @click="showCityDetail(r.city)"
           >
             <div class="absolute top-0 left-0 right-0 h-1"
               :class="idx === 0 ? 'bg-primary' : idx === 1 ? 'bg-secondary' : 'bg-accent'"
@@ -119,9 +119,8 @@
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md"
               :class="idx === 0 ? 'bg-primary' : idx === 1 ? 'bg-secondary' : 'bg-accent'"
             >
-              {{ '🏆🥈🥉'[idx] }}
+              {{ idx === 0 ? '🏆' : idx === 1 ? '🥈' : '🥉' }}
             </div>
-            <span class="text-lg">{{ r.city.emoji }}</span>
             <span class="text-sm font-bold text-gray-700">{{ r.city.name }}</span>
             <span class="text-xs font-bold"
               :class="idx === 0 ? 'text-primary' : idx === 1 ? 'text-secondary' : 'text-accent'"
@@ -135,7 +134,7 @@
           </div>
         </div>
 
-        <div class="h-[420px] w-full rounded-2xl overflow-hidden border border-gray-100 shadow-inner">
+        <div class="w-full">
           <ChinaMap
             :top-cities="mapTopCities"
             :merged-points="mapMergedPoints"
@@ -421,6 +420,14 @@
       </div>
     </div>
 
+    <CityDetailCard
+      :visible="detailCardVisible"
+      :city="detailCardCity"
+      :match-percentage="detailCardMatch"
+      :reason="detailCardReason"
+      @close="detailCardVisible = false"
+    />
+
   </div>
 </template>
 
@@ -430,15 +437,21 @@ import { useRouter, useRoute } from 'vue-router'
 import RadarChart from '../components/RadarChart.vue'
 import ChinaMap from '../components/ChinaMap.vue'
 import CityPersonaImage from '../components/CityPersonaImage.vue'
+import CityDetailCard from '../components/CityDetailCard.vue'
 import { getEnhancedBaziInfo, WUXING_COLORS, WUXING_EMOJI } from '../composables/useBazi'
 import { cities, cityPersonalities } from '../data/cities'
-import type { CityResult, SharedUserData, BaziInfo, CityPersonality } from '../types'
+import type { CityResult, SharedUserData, BaziInfo, CityPersonality, City } from '../types'
 
 const router = useRouter()
 const route = useRoute()
 
 const privateMode = ref(false)
 const shareName = ref('')
+
+const detailCardVisible = ref(false)
+const detailCardCity = ref<City | null>(null)
+const detailCardMatch = ref(0)
+const detailCardReason = ref('')
 
 const store = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
 const results = store.results
@@ -606,10 +619,13 @@ const ZHI_WUXING_MAP: Record<string, string> = {
 
 function showCityDetail(city: CityResult['city'] | string) {
   const cityName = typeof city === 'string' ? city : city.name
+  const cityData = cities.find(c => c.name === cityName)
+  if (!cityData) return
   const result = topResults.value.find(r => r.city.name === cityName)
-  const match = result?.matchPercentage || allScores.value[cities.find(c => c.name === cityName)?.id || ''] || 0
-  const reason = result?.reason || ''
-  alert(`📍 ${cityName}\n匹配度: ${match}%\n\n${reason}`)
+  detailCardCity.value = cityData
+  detailCardMatch.value = result?.matchPercentage || allScores.value[cityData.id] || 0
+  detailCardReason.value = result?.reason || ''
+  detailCardVisible.value = true
 }
 
 function generateShareLink(): string {
