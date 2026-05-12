@@ -41,7 +41,7 @@
               :city-name="topResults[0]?.city.name || ''"
               :color="personalityProfile.color"
               :tag="personalityProfile.tag"
-              :emoji="personalityProfile.emoji"
+              :emoji="personalityProfile.emoji || ''"
             />
           </div>
           <div class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-2xl shadow-sm border border-gray-100 mb-2">
@@ -486,7 +486,7 @@ const personalityProfile = computed<CityPersonality | null>(() => {
 })
 
 const personalityEmoji = computed(() => {
-  return personalityProfile.value?.emoji || '🏙️'
+  return topResults.value[0]?.city.emoji || '🏙️'
 })
 
 const personalityAssetSrc = computed(() => {

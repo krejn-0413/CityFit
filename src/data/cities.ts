@@ -2,100 +2,103 @@ import type { City, CityPersonality } from '../types'
 
 export const cityPersonalities: Record<string, CityPersonality[]> = {
   chengdu: [
-    { tag: '躺平熊猫人', emoji: '🐼', color: '#FF6B6B', description: '茶馆一坐一下午，火锅一吃一整天，人生最高境界：巴适。', imagePrompt: 'Anime character sitting in bamboo tea house, holding tea cup, panda plush toy, relaxed happy expression, warm cozy lighting, soft colors' },
+    { tag: '巴适熊猫侠', color: '#FF6B6B', description: '茶馆一坐一下午，火锅一吃一整天，人生最高境界：巴适。', imagePrompt: 'Anime character sitting in bamboo tea house, holding tea cup, panda plush toy, relaxed happy expression, warm cozy lighting, soft colors, semi-realistic anime style, soft shading' },
   ],
   shanghai: [
-    { tag: '精致卷王', emoji: '🌆', color: '#45B7D1', description: '外滩喝咖啡，陆家嘴搬砖，精致穷但必须赢。', imagePrompt: 'Anime young professional at the Bund, city skyline at dusk, business casual outfit, windblown hair, confident pose' },
+    { tag: '精致卷王', color: '#45B7D1', description: '外滩喝咖啡，陆家嘴搬砖，精致穷但必须赢。', imagePrompt: 'Anime character at the Bund, city skyline at dusk, business casual outfit, windblown hair, confident pose, semi-realistic anime style, soft shading' },
   ],
   beijing: [
-    { tag: '局气老炮儿', emoji: '🏯', color: '#FFD93D', description: '胡同串子一个，豆汁焦圈安排上，做人讲究的就是局气。', imagePrompt: 'Anime character in Beijing hutong, red lanterns, confident smile, casual traditional wear, warm golden light' },
+    { tag: '局气老炮儿', color: '#FFD93D', description: '胡同串子一个，豆汁焦圈安排上，做人讲究的就是局气。', imagePrompt: 'Anime character in Beijing hutong, red lanterns, confident smile, casual traditional wear, warm golden light, semi-realistic anime style, soft shading' },
   ],
   hangzhou: [
-    { tag: '西湖划水大师', emoji: '🌊', color: '#4ECDC4', description: '西湖边喝茶，龙井村摸鱼，主打一个诗意地躺平。', imagePrompt: 'Anime person by West Lake, holding umbrella, willow trees, misty lake, hanfu-inspired clothes, soft green palette' },
+    { tag: '西湖风雅居士', color: '#4ECDC4', description: '西湖边吟诗，龙井村品茗，主打一个风雅地生活。', imagePrompt: 'Anime character by West Lake, holding umbrella, willow trees, misty lake, hanfu-inspired clothes, soft green palette, semi-realistic anime style, soft shading' },
   ],
   shenzhen: [
-    { tag: '搞钱特种兵', emoji: '🚀', color: '#45B7D1', description: '华强北出生的崽，脑子里只有三个字：搞！钱！钱！', imagePrompt: 'Anime young entrepreneur in tech park, holographic device, sneakers and hoodie, neon blue accents, energetic pose' },
+    { tag: '搞钱特种兵', color: '#45B7D1', description: '华强北出生的崽，脑子里只有三个字：搞！钱！钱！', imagePrompt: 'Anime character in tech park, holographic device, sneakers and hoodie, neon blue accents, energetic pose, semi-realistic anime style, soft shading' },
   ],
   chongqing: [
-    { tag: '火锅喷射战士', emoji: '🌶️', color: '#FF6B6B', description: '微辣是最后的底线，8D魔幻山城，每天都在爬坡上坎。', imagePrompt: 'Anime character on monorail through building, holding spicy hotpot, neon signs, bold red colors, dynamic view' },
+    { tag: '火锅喷射战士', color: '#FF6B6B', description: '微辣是最后的底线，8D魔幻山城，每天都在爬坡上坎。', imagePrompt: 'Anime character on monorail through building, holding spicy hotpot, neon signs, bold red colors, dynamic view, semi-realistic anime style, soft shading' },
   ],
   xian: [
-    { tag: '大唐摸鱼王', emoji: '🏛️', color: '#96CEB4', description: '城墙根下骑单车，大唐不夜城凑热闹，千年古都打工人。', imagePrompt: 'Anime character biking on ancient city wall, pagoda in sunset, scarf flowing, warm earthy tones, relaxed vibe' },
+    { tag: '大唐穿越客', color: '#EF5350', description: '城墙根下骑单车，大唐不夜城凑热闹，穿越古今的快乐。', imagePrompt: 'Anime character biking on ancient city wall, pagoda in sunset, scarf flowing, warm earthy tones, relaxed vibe, semi-realistic anime style, soft shading' },
   ],
   kunming: [
-    { tag: '春城花心大少', emoji: '🌸', color: '#4ECDC4', description: '四季如春花开不断，喂海鸥赏樱花，日子不要太安逸。', imagePrompt: 'Anime person with flowers, feeding seagulls by lake, cherry blossoms, flowy pastel clothes, soft sunlight' },
+    { tag: '春城花心大少', color: '#4ECDC4', description: '四季如春花开不断，喂海鸥赏樱花，日子不要太安逸。', imagePrompt: 'Anime character with flowers, feeding seagulls by lake, cherry blossoms, flowy pastel clothes, soft sunlight, semi-realistic anime style, soft shading' },
   ],
   guangzhou: [
-    { tag: '早茶专业户', emoji: '🥟', color: '#FFD93D', description: '一盅两件是底线，晚上大排档走起，食在广州不是吹的。', imagePrompt: 'Anime character at dim sum restaurant, bamboo steamers, drinking tea, happy expression, warm morning light' },
+    { tag: '早茶专业户', color: '#FFD93D', description: '一盅两件是底线，晚上大排档走起，食在广州不是吹的。', imagePrompt: 'Anime character at dim sum restaurant, bamboo steamers, drinking tea, happy expression, warm morning light, semi-realistic anime style, soft shading' },
   ],
   sanya: [
-    { tag: '沙滩咸鱼王', emoji: '🏖️', color: '#4ECDC4', description: '人字拖一蹬、椰子一抱，面朝大海，啥也不想。', imagePrompt: 'Anime person on sunny beach, holding coconut, casual beachwear, palm trees, ocean waves, bright colors' },
+    { tag: '沙滩咸鱼王', color: '#F48FB1', description: '人字拖一蹬、椰子一抱，面朝大海，啥也不想。', imagePrompt: 'Anime character on sunny beach, holding coconut, casual beachwear, palm trees, ocean waves, bright colors, semi-realistic anime style, soft shading' },
   ],
   nanjing: [
-    { tag: '梧桐树下文艺混子', emoji: '📚', color: '#96CEB4', description: '梧桐大道上装文青，秦淮河边喝咖啡，假装很有文化。', imagePrompt: 'Anime person walking under sycamore trees, holding book, autumn leaves falling, vintage style, poetic mood' },
+    { tag: '梧桐树下文艺混子', color: '#96CEB4', description: '梧桐大道上装文青，秦淮河边喝咖啡，假装很有文化。', imagePrompt: 'Anime character walking under sycamore trees, holding book, autumn leaves falling, vintage style, poetic mood, semi-realistic anime style, soft shading' },
   ],
   dali: [
-    { tag: '辞职专业户', emoji: '🏔️', color: '#4ECDC4', description: '苍山洱海间发呆，民谣酒吧里装深沉，辞职信已写好。', imagePrompt: 'Anime person on grassy hill overlooking lake, mountains in mist, bohemian dress, guitar, golden sunset' },
+    { tag: '辞职专业户', color: '#B39DDB', description: '苍山洱海间发呆，民谣酒吧里装深沉，辞职信已写好。', imagePrompt: 'Anime character on grassy hill overlooking lake, mountains in mist, bohemian dress, guitar, golden sunset, semi-realistic anime style, soft shading' },
   ],
   changsha: [
-    { tag: '夜宵战神', emoji: '🍢', color: '#FF6B6B', description: '凌晨三点还在嗦小龙虾，快乐是夜宵给的。', imagePrompt: 'Anime person at night market, holding crayfish skewers, neon signs, laughing, steam from food, warm night' },
+    { tag: '夜宵战神', color: '#FFAB40', description: '凌晨三点还在嗦小龙虾，快乐是夜宵给的。', imagePrompt: 'Anime character at night market, holding crayfish skewers, neon signs, laughing, steam from food, warm night, semi-realistic anime style, soft shading' },
   ],
   suzhou: [
-    { tag: '园林躺平学博士', emoji: '🎋', color: '#96CEB4', description: '假山旁喝茶、亭子里打盹，论躺平苏州人最懂。', imagePrompt: 'Anime character in classical garden, pavilion, drinking tea, koi pond, elegant dress, bamboo, peaceful vibe' },
+    { tag: '江南慢生活家', color: '#96CEB4', description: '假山旁喝茶、亭子里打盹，江南最懂慢生活。', imagePrompt: 'Anime character in classical garden, pavilion, drinking tea, koi pond, elegant dress, bamboo, peaceful vibe, semi-realistic anime style, soft shading' },
   ],
   qingdao: [
-    { tag: '哈啤酒肚腩潜力股', emoji: '🍺', color: '#45B7D1', description: '塑料袋装啤酒，海边吹牛聊天，青岛人的快乐就这么简单。', imagePrompt: 'Anime person on pier, holding bag of beer, ocean breeze, European buildings, relaxed happy, seaside' },
+    { tag: '哈啤酒肚腩潜力股', color: '#81D4FA', description: '塑料袋装啤酒，海边吹牛聊天，青岛人的快乐就这么简单。', imagePrompt: 'Anime character on pier, holding bag of beer, ocean breeze, European buildings, relaxed happy, seaside, semi-realistic anime style, soft shading' },
   ],
   lasa: [
-    { tag: '缺氧文艺青年', emoji: '🏔️', color: '#FF6B6B', description: '布达拉宫前凹造型，大昭寺边转经筒，高反也挡不住装逼的心。', imagePrompt: 'Anime character before Potala Palace, Tibetan clothing, prayer flag, snow mountains, golden sunset, spiritual vibe' },
+    { tag: '缺氧文艺青年', color: '#B39DDB', description: '布达拉宫前凹造型，大昭寺边转经筒，高反也挡不住朝圣的心。', imagePrompt: 'Anime character before Potala Palace, Tibetan clothing, prayer flag, snow mountains, golden sunset, spiritual vibe, semi-realistic anime style, soft shading' },
   ],
   wuhan: [
-    { tag: '过早碳水狂魔', emoji: '⚓', color: '#FFD93D', description: '热干面+豆皮+蛋酒，过早一个月不重样，江湖儿女的豪爽。', imagePrompt: 'Anime character by Yangtze River bridge, holding bowl of hot dry noodles, heroic pose, misty river, warm light' },
+    { tag: '过早碳水狂魔', color: '#FFAB40', description: '热干面+豆皮+蛋酒，过早一个月不重样，江湖儿女的豪爽。', imagePrompt: 'Anime character by Yangtze River bridge, holding bowl of hot dry noodles, heroic pose, misty river, warm light, semi-realistic anime style, soft shading' },
   ],
   xiamen: [
-    { tag: '文艺青年', emoji: '🏝️', color: '#4ECDC4', description: '鼓浪屿盖章、环岛路骑行，朋友圈必须九宫格。', imagePrompt: 'Anime person cycling on coastal road, island in distance, sunset, summer dress, straw hat, seabirds' },
+    { tag: '文艺青年', color: '#F48FB1', description: '鼓浪屿盖章、环岛路骑行，朋友圈必须九宫格。', imagePrompt: 'Anime character cycling on coastal road, island in distance, sunset, summer dress, straw hat, seabirds, semi-realistic anime style, soft shading' },
   ],
   dalian: [
-    { tag: '海蛎子味老铁', emoji: '🏰', color: '#45B7D1', description: '俄罗斯风情街遛弯，滨海路吹海风，东北口音的海边浪漫。', imagePrompt: 'Anime character on coastal boardwalk, Russian architecture, waves, autumn coat, windblown hair, cinematic mood' },
+    { tag: '海蛎子味老铁', color: '#81D4FA', description: '俄罗斯风情街遛弯，滨海路吹海风，东北口音的海边浪漫。', imagePrompt: 'Anime character on coastal boardwalk, Russian architecture, waves, autumn coat, windblown hair, cinematic mood, semi-realistic anime style, soft shading' },
   ],
   harbin: [
-    { tag: '冰雪大冤种', emoji: '❄️', color: '#45B7D1', description: '零下30度吃冰棍，冰雪大世界里冻成狗但很快乐。', imagePrompt: 'Anime person in ice world, glowing ice sculptures, thick winter coat, fur hat, snowflakes, magical blue lighting' },
+    { tag: '冰城冒险家', color: '#EF5350', description: '零下30度吃冰棍，冰雪大世界里撒欢，寒冷挡不住热情。', imagePrompt: 'Anime character in ice world, glowing ice sculptures, thick winter coat, fur hat, snowflakes, magical blue lighting, semi-realistic anime style, soft shading' },
   ],
   tianjin: [
-    { tag: '相声气氛组', emoji: '🎭', color: '#FFD93D', description: '茶馆听相声能笑到肚子疼，煎饼果子加俩蛋是基本操作。', imagePrompt: 'Anime person laughing in tea house, watching crosstalk, holding jianbing, traditional interior, warm cozy' },
+    { tag: '相声气氛组', color: '#78909C', description: '茶馆听相声能笑到肚子疼，煎饼果子加俩蛋是基本操作。', imagePrompt: 'Anime character laughing in tea house, watching crosstalk, holding jianbing, traditional interior, warm cozy, semi-realistic anime style, soft shading' },
   ],
   guiyang: [
-    { tag: '山里蹲代码仔', emoji: '🌲', color: '#4ECDC4', description: '山里有城城里有山，在大数据之都边吸氧边写bug。', imagePrompt: 'Anime character in green mountain city, laptop surrounded by nature, misty hills, modern meets nature vibe' },
+    { tag: '山里蹲代码仔', color: '#80CBC4', description: '山里有城城里有山，在大数据之都边吸氧边写bug。', imagePrompt: 'Anime character in green mountain city, laptop surrounded by nature, misty hills, modern meets nature vibe, semi-realistic anime style, soft shading' },
   ],
   lanzhou: [
-    { tag: '牛大碳水杀手', emoji: '🍜', color: '#FFD93D', description: '一碗牛大唤醒灵魂，黄河水养育的西北干饭人。', imagePrompt: 'Anime person at noodle shop, holding big bowl of beef noodles, Yellow River view, hearty expression' },
+    { tag: '黄河牛肉面侠', color: '#FFB74D', description: '一碗牛大唤醒灵魂，黄河边豪迈的西北干饭人。', imagePrompt: 'Anime character at noodle shop, holding big bowl of beef noodles, Yellow River view, hearty expression, semi-realistic anime style, soft shading' },
   ],
   shenyang: [
-    { tag: '东北纯爷们', emoji: '🏰', color: '#FF6B6B', description: '沈阳故宫前耍帅，铁西区工业硬核风，必须支棱起来。', imagePrompt: 'Anime character at imperial palace in snow, red walls, winter coat, confident stance, dramatic sky' },
+    { tag: '东北纯爷们', color: '#EF5350', description: '沈阳故宫前耍帅，铁西区工业硬核风，必须支棱起来。', imagePrompt: 'Anime character at imperial palace in snow, red walls, winter coat, confident stance, dramatic sky, semi-realistic anime style, soft shading' },
   ],
   jinan: [
-    { tag: '泉水泡jio达人', emoji: '⛲', color: '#4ECDC4', description: '趵突泉看水泡，大明湖赏荷花，日子像泉水一样清甜。', imagePrompt: 'Anime person by spring, clear water bubbling, lotus lake, traditional summer outfit, fan, fresh green tones' },
+    { tag: '泉水泡jio达人', color: '#CE93D8', description: '趵突泉看水泡，大明湖赏荷花，日子像泉水一样清甜。', imagePrompt: 'Anime character by spring, clear water bubbling, lotus lake, traditional summer outfit, fan, fresh green tones, semi-realistic anime style, soft shading' },
   ],
   luoyang: [
-    { tag: '牡丹花下酒鬼', emoji: '🌸', color: '#FF6B6B', description: '龙门石窟看大佛，牡丹花下喝小酒，神都生活赛神仙。', imagePrompt: 'Anime character in peony garden, Longmen Grottoes in distance, hanfu robe, holding flower, imperial aesthetic' },
+    { tag: '牡丹花下酒鬼', color: '#CE93D8', description: '龙门石窟看大佛，牡丹花下喝小酒，神都生活赛神仙。', imagePrompt: 'Anime character in peony garden, Longmen Grottoes in distance, hanfu robe, holding flower, imperial aesthetic, semi-realistic anime style, soft shading' },
   ],
   guilin: [
-    { tag: '甲天下摸鱼圣手', emoji: '🏞️', color: '#4ECDC4', description: '漓江竹筏漂流，喀斯特山水中思考人生：今天摸鱼吗？', imagePrompt: 'Anime person on bamboo raft, karst mountains, misty river, bamboo hat, traditional clothes, ink painting style' },
+    { tag: '山水画中人', color: '#80CBC4', description: '漓江竹筏漂流，喀斯特山水中如在画中游。', imagePrompt: 'Anime character on bamboo raft, karst mountains, misty river, bamboo hat, traditional clothes, ink painting style, semi-realistic anime style, soft shading' },
   ],
   zhuhai: [
-    { tag: '养老预备军', emoji: '🌴', color: '#4ECDC4', description: '情侣路吹海风，横琴岛看日落，提前30年进入退休生活。', imagePrompt: 'Anime person cycling on Lovers Road, ocean view, palm trees, summer dress, sunshine, relaxed happy vibe' },
+    { tag: '浪漫海岸散步者', color: '#F48FB1', description: '情侣路吹海风，横琴岛看日落，浪漫就是日常。', imagePrompt: 'Anime character cycling on Lovers Road, ocean view, palm trees, summer dress, sunshine, relaxed happy vibe, semi-realistic anime style, soft shading' },
   ],
   hohhot: [
-    { tag: '草原烤肉王子', emoji: '🐏', color: '#96CEB4', description: '敕勒川上骑马，蒙古包里喝奶茶，烤肉必须管够。', imagePrompt: 'Anime character on grassland, Mongolian robe, holding milk tea, horses and yurt, blue sky, epic landscape' },
+    { tag: '草原烤肉王子', color: '#9CCC65', description: '敕勒川上骑马，蒙古包里喝奶茶，烤肉必须管够。', imagePrompt: 'Anime character on grassland, Mongolian robe, holding milk tea, horses and yurt, blue sky, epic landscape, semi-realistic anime style, soft shading' },
   ],
   zhengzhou: [
-    { tag: '中原跑腿小哥', emoji: '🏛️', color: '#FFD93D', description: '天地之中四通八达，郑州的标签就是：去哪都方便。', imagePrompt: 'Anime person at Shaolin Temple, martial arts pose, autumn leaves, sporty outfit, energetic, golden colors' },
+    { tag: '中原枢纽站长', color: '#9CCC65', description: '天地之中四通八达，去哪都方便的中原核心。', imagePrompt: 'Anime character at Shaolin Temple, martial arts pose, autumn leaves, sporty outfit, energetic, golden colors, semi-realistic anime style, soft shading' },
   ],
   nanchang: [
-    { tag: '瓦罐汤干饭王', emoji: '🏗️', color: '#FF6B6B', description: '滕王阁上吟诗，瓦罐汤里捞肉，南昌人的胃就是这么实在。', imagePrompt: 'Anime character at Pavilion of Prince Teng, overlook river sunset, holding brush, traditional scholar robe' },
+    { tag: '瓦罐汤干饭王', color: '#FFB74D', description: '滕王阁上吟诗，瓦罐汤里捞肉，南昌人的胃就是这么实在。', imagePrompt: 'Anime character at Pavilion of Prince Teng, overlook river sunset, holding brush, traditional scholar robe, semi-realistic anime style, soft shading' },
   ],
   hefei: [
-    { tag: '科创死宅技术宅', emoji: '🔬', color: '#45B7D1', description: '科学岛上做实验，巢湖边看落日，理性与浪漫我全都要。', imagePrompt: 'Anime person on Science Island, lake sunset, holding beaker, glasses, lab coat, intellectual thoughtful look' },
+    { tag: '科学岛极客', color: '#78909C', description: '科学岛上做实验，巢湖边看落日，理性与浪漫我全都要。', imagePrompt: 'Anime character on Science Island, lake sunset, holding beaker, glasses, lab coat, intellectual thoughtful look, semi-realistic anime style, soft shading' },
+  ],
+  explorer: [
+    { tag: '城市探索家', color: '#9CA3AF', description: '不限于一城一池，你的灵魂属于更广阔的天地。', imagePrompt: 'Anime character with backpack looking at distant city skyline, curious expression, warm sunset light, semi-realistic anime style, soft shading' },
   ],
 }
 
@@ -105,7 +108,7 @@ export const cities: City[] = [
     coordinates: [104.07, 30.57],
     tags: ['慢生活', '巴适', '美食'],
     description: '一座来了就不想走的城市，巴适得很！',
-    personalities: ['躺平熊猫人'],
+    personalities: ['巴适熊猫侠'],
     material: 75, spiritual: 85, xuanxue: 70,
     baziPreference: ['土', '火'],
   },
@@ -119,7 +122,7 @@ export const cities: City[] = [
     baziPreference: ['金', '水'],
   },
   {
-    id: 'beijing', name: '北京', province: '北京', emoji: '🏯',
+    id: 'beijing', name: '北京', province: '北京', emoji: '🀄',
     coordinates: [116.40, 39.90],
     tags: ['帝都', '胡同', '大气'],
     description: '千年古都，大气磅礴，机会与底蕴并存。',
@@ -132,7 +135,7 @@ export const cities: City[] = [
     coordinates: [120.15, 30.28],
     tags: ['西湖', '诗意', '互联网'],
     description: '人间天堂，诗意盎然的数字之城。',
-    personalities: ['西湖划水大师'],
+    personalities: ['西湖风雅居士'],
     material: 80, spiritual: 90, xuanxue: 65,
     baziPreference: ['水', '木'],
   },
@@ -159,7 +162,7 @@ export const cities: City[] = [
     coordinates: [108.93, 34.27],
     tags: ['古都', '历史', '面食'],
     description: '自古帝王都，十三朝古都的厚重与新生。',
-    personalities: ['大唐摸鱼王'],
+    personalities: ['大唐穿越客'],
     material: 70, spiritual: 75, xuanxue: 80,
     baziPreference: ['土', '金'],
   },
@@ -222,7 +225,7 @@ export const cities: City[] = [
     coordinates: [120.58, 31.30],
     tags: ['园林', '水乡', '雅致'],
     description: '江南水乡，园林甲天下。',
-    personalities: ['园林躺平学博士'],
+    personalities: ['江南慢生活家'],
     material: 70, spiritual: 80, xuanxue: 70,
     baziPreference: ['水', '木'],
   },
@@ -258,7 +261,7 @@ export const cities: City[] = [
     coordinates: [118.09, 24.46],
     tags: ['海岛', '文艺', '小资'],
     description: '海上花园，文艺青年的精神故乡。',
-    personalities: ['文艺装X青年'],
+    personalities: ['文艺青年'],
     material: 70, spiritual: 80, xuanxue: 60,
     baziPreference: ['水', '木'],
   },
@@ -276,7 +279,7 @@ export const cities: City[] = [
     coordinates: [126.63, 45.75],
     tags: ['冰雪', '俄式', '热情'],
     description: '冰城夏都，冰雪与热情的交响。',
-    personalities: ['冰雪大冤种'],
+    personalities: ['冰城冒险家'],
     material: 65, spiritual: 70, xuanxue: 65,
     baziPreference: ['水', '金'],
   },
@@ -303,7 +306,7 @@ export const cities: City[] = [
     coordinates: [103.73, 36.03],
     tags: ['牛肉面', '黄河', '豪爽'],
     description: '一碗牛大唤醒一天，黄河穿城而过的豪迈之城。',
-    personalities: ['牛大碳水杀手'],
+    personalities: ['黄河牛肉面侠'],
     material: 60, spiritual: 70, xuanxue: 70,
     baziPreference: ['土', '金'],
   },
@@ -326,7 +329,7 @@ export const cities: City[] = [
     baziPreference: ['水', '土'],
   },
   {
-    id: 'luoyang', name: '洛阳', province: '河南', emoji: '🌸',
+    id: 'luoyang', name: '洛阳', province: '河南', emoji: '🏵️',
     coordinates: [112.45, 34.62],
     tags: ['古都', '牡丹', '神都'],
     description: '神都洛阳，牡丹花开的千年帝都。',
@@ -339,7 +342,7 @@ export const cities: City[] = [
     coordinates: [110.28, 25.29],
     tags: ['山水', '漓江', '喀斯特'],
     description: '桂林山水甲天下，人在画中游。',
-    personalities: ['甲天下摸鱼圣手'],
+    personalities: ['山水画中人'],
     material: 55, spiritual: 85, xuanxue: 70,
     baziPreference: ['水', '木'],
   },
@@ -348,7 +351,7 @@ export const cities: City[] = [
     coordinates: [113.57, 22.27],
     tags: ['海滨', '宜居', '浪漫'],
     description: '南海之滨的浪漫之城，最适合养老的地方。',
-    personalities: ['养老预备军'],
+    personalities: ['浪漫海岸散步者'],
     material: 70, spiritual: 80, xuanxue: 60,
     baziPreference: ['水', '火'],
   },
@@ -366,12 +369,12 @@ export const cities: City[] = [
     coordinates: [113.65, 34.76],
     tags: ['交通', '枢纽', '中原'],
     description: '天地之中，四通八达的中原核心。',
-    personalities: ['中原跑腿小哥'],
+    personalities: ['中原枢纽站长'],
     material: 75, spiritual: 65, xuanxue: 65,
     baziPreference: ['土', '火'],
   },
   {
-    id: 'nanchang', name: '南昌', province: '江西', emoji: '🏗️',
+    id: 'nanchang', name: '南昌', province: '江西', emoji: '🍲',
     coordinates: [115.89, 28.68],
     tags: ['英雄城', '赣江', '美食'],
     description: '英雄之城，赣江之滨的红色摇篮。',
@@ -384,7 +387,7 @@ export const cities: City[] = [
     coordinates: [117.27, 31.86],
     tags: ['科技', '创新', '宜居'],
     description: '大湖名城创新高地，低调的科技之都。',
-    personalities: ['科创死宅技术宅'],
+    personalities: ['科学岛极客'],
     material: 75, spiritual: 70, xuanxue: 60,
     baziPreference: ['水', '木'],
   },

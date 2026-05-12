@@ -28,7 +28,7 @@
                 :city-name="city.name"
                 :color="personality.color"
                 :tag="personality.tag"
-                :emoji="personality.emoji"
+                :emoji="personality.emoji || ''"
               />
             </div>
             <div class="text-center">

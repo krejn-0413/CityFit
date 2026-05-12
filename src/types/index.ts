@@ -43,7 +43,7 @@ export interface City {
 
 export interface CityPersonality {
   tag: string
-  emoji: string
+  emoji?: string
   color: string
   description: string
   imagePrompt: string

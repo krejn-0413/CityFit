@@ -11,7 +11,7 @@ function getPersonalityTag(scores: Record<string, number>): string {
   return '城市探索家'
 }
 
-export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, gender: string) {
+export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, _gender: string) {
   const scores: Record<string, number> = {}
 
   cities.forEach((city) => {
@@ -33,14 +33,14 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
   })
 
   const maxScore = Math.max(...Object.values(scores))
+  const THEORETICAL_MAX = 42
 
   if (maxScore <= 0) {
     return {
       topResults: cities.slice(0, 3).map((city) => ({
         city,
         matchPercentage: 0,
-        matchType: 'general' as const,
-        personalityTag: '城市探索家',
+        reason: '',
       })),
       personalityTag: '城市探索家',
       allScores: Object.fromEntries(cities.map((c) => [c.id, 0])),
@@ -50,7 +50,7 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
 
   const normalizedScores: Record<string, number> = {}
   Object.entries(scores).forEach(([cityId, score]) => {
-    normalizedScores[cityId] = Math.round((score / maxScore) * 100)
+    normalizedScores[cityId] = Math.round((score / THEORETICAL_MAX) * 100)
   })
 
   if (baziInfo) {
@@ -58,23 +58,7 @@ export function calculateResults(answers: Answer[], baziInfo: BaziInfo | null, g
       const matchCount = city.baziPreference.filter((elem) =>
         baziInfo.likes.includes(elem)
       ).length
-      normalizedScores[city.id] += matchCount * 5
-    })
-  }
-
-  if (gender === 'female') {
-    const feminineCities = ['suzhou', 'hangzhou', 'kunming', 'nanjing', 'chengdu']
-    feminineCities.forEach((id) => {
-      if (normalizedScores[id]) {
-        normalizedScores[id] += 3
-      }
-    })
-  } else {
-    const masculineCities = ['beijing', 'shenzhen', 'chongqing', 'xian']
-    masculineCities.forEach((id) => {
-      if (normalizedScores[id]) {
-        normalizedScores[id] += 3
-      }
+      normalizedScores[city.id] = Math.round(normalizedScores[city.id] * (1 + matchCount * 0.03))
     })
   }
 
