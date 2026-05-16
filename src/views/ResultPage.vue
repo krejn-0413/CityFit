@@ -1,20 +1,82 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-cyan-50">
-    <div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
+    <!-- 预览模式：无测试结果，来自好友分享链接 -->
+    <template v-if="previewMode">
+      <div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
 
-      <div v-if="sharedFromFriend" class="animate-slide-up bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-5 border border-purple-200 shadow-sm">
-        <div class="flex items-center gap-3">
-          <span class="text-3xl">👋</span>
-          <div>
-            <p class="text-sm font-bold text-gray-700">
-              {{ sharedFromFriend.private ? '一位匿名好友' : sharedFromFriend.name }} 分享了TA的城市测评
-            </p>
-            <p class="text-xs text-gray-500">以下地图中彩色气泡为好友的推荐城市，你也可以测测自己的！</p>
+        <div class="animate-slide-up bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-6 border border-purple-200 shadow-sm text-center">
+          <span class="text-4xl">👋</span>
+          <p class="text-lg font-bold text-gray-700 mt-3">
+            {{ sharedFromFriend?.private ? '一位匿名好友' : sharedFromFriend?.name }}
+          </p>
+          <p class="text-sm text-gray-500 mt-1">
+            分享了TA的城市测评，来看看TA的本命城市！
+          </p>
+        </div>
+
+        <h3 class="text-xl font-display font-bold text-gray-700 flex items-center gap-2">
+          <span class="w-1.5 h-6 bg-gradient-to-b from-primary to-secondary rounded-full inline-block"></span>
+          🏆 {{ sharedFromFriend?.private ? 'TA' : sharedFromFriend?.name }}的 Top 3 城市
+        </h3>
+
+        <div v-for="(r, idx) in previewFriendCities" :key="r.cityId"
+          class="glass-card-strong p-5"
+        >
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shrink-0"
+              :class="idx === 0 ? 'bg-gradient-to-br from-primary to-primary-light' : idx === 1 ? 'bg-gradient-to-br from-secondary to-secondary-light' : 'bg-gradient-to-br from-accent to-accent-light'"
+            >
+              {{ idx + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-bold text-gray-800">{{ r.cityName }}</span>
+                <span class="text-xs text-gray-400">匹配度 {{ r.matchPercentage }}%</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="text-center animate-slide-up">
+        <div class="section-block-accent">
+          <ChinaMap
+            :top-cities="previewMapCities"
+            :team-id="teamId"
+            :show-team-label="true"
+          />
+        </div>
+
+        <div class="text-center animate-fade-in">
+          <button @click="goTakeTest"
+            class="px-10 py-5 bg-gradient-to-r from-primary to-secondary text-white text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+          >
+            🧪 我也要测测我的本命城市
+          </button>
+          <p class="text-xs text-gray-400 mt-3">完成测试后，可以选择加入TA的小队一起点亮地图！</p>
+        </div>
+
+        <div class="text-center text-xs text-gray-300 py-4">
+          © 2026 CityFit · 仅供娱乐 · 开心就好 😊
+        </div>
+      </div>
+    </template>
+
+    <!-- 正常模式：有测试结果 -->
+    <template v-else>
+      <div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
+
+        <div v-if="sharedFromFriend" class="animate-slide-up bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-5 border border-purple-200 shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">👋</span>
+            <div>
+              <p class="text-sm font-bold text-gray-700">
+                {{ sharedFromFriend.private ? '一位匿名好友' : sharedFromFriend.name }} 分享了TA的城市测评
+              </p>
+              <p class="text-xs text-gray-500">以下地图中彩色气泡为好友的推荐城市，你也可以测测自己的！</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center animate-slide-up">
         <div class="text-6xl mb-4">🎉</div>
         <h1 class="text-3xl md:text-4xl font-display font-bold text-gray-800 mb-2">
           你的城市人格是...
@@ -415,18 +477,46 @@
       </div>
     </div>
 
-      <div class="text-center text-xs text-gray-300 py-4">
-        © 2026 CityFit · 仅供娱乐 · 开心就好 😊
+        <div class="text-center text-xs text-gray-300 py-4">
+          © 2026 CityFit · 仅供娱乐 · 开心就好 😊
+        </div>
+      </div>
+
+      <CityDetailCard
+        :visible="detailCardVisible"
+        :city="detailCardCity"
+        :match-percentage="detailCardMatch"
+        :reason="detailCardReason"
+        @close="detailCardVisible = false"
+      />
+
+    </template>
+
+    <!-- 加入小队弹窗 -->
+    <div v-if="showJoinPrompt"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
+      @click.self="declineJoinTeam"
+    >
+      <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center animate-scale-in">
+        <span class="text-4xl">🤝</span>
+        <h3 class="text-base font-bold text-gray-700 mt-3">加入小队</h3>
+        <p class="text-sm text-gray-500 mt-2">
+          是否加入「{{ pendingTeamName }}」的小队，一起在地图上点亮城市？
+        </p>
+        <div class="flex gap-3 mt-5">
+          <button @click="acceptJoinTeam"
+            class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-2xl hover:shadow-md transition-all"
+          >
+            ✅ 加入
+          </button>
+          <button @click="declineJoinTeam"
+            class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-2xl hover:bg-gray-200 transition-all"
+          >
+            不了
+          </button>
+        </div>
       </div>
     </div>
-
-    <CityDetailCard
-      :visible="detailCardVisible"
-      :city="detailCardCity"
-      :match-percentage="detailCardMatch"
-      :reason="detailCardReason"
-      @close="detailCardVisible = false"
-    />
 
   </div>
 </template>
@@ -465,6 +555,10 @@ const teamId = ref(results?.teamId || Math.random().toString(36).substring(2, 6)
 const teamMembers = ref<{ name: string; results: { cityId: string; cityName: string; matchPercentage: number }[] }[]>([])
 const showJoinInput = ref(false)
 const joinTeamCode = ref('')
+
+const previewMode = ref(false)
+const showJoinPrompt = ref(false)
+const pendingTeamName = ref('')
 
 if (results && !results.teamId) {
   results.teamId = teamId.value
@@ -546,6 +640,20 @@ const mapMergedPoints = computed(() => {
 })
 
 const sharedFromFriend = ref<SharedUserData | null>(null)
+
+const previewFriendCities = computed(() => {
+  if (!sharedFromFriend.value) return []
+  return sharedFromFriend.value.results
+})
+
+const previewMapCities = computed(() => {
+  if (!sharedFromFriend.value) return []
+  return sharedFromFriend.value.results.map((r, idx) => ({
+    name: r.cityName,
+    value: r.matchPercentage,
+    color: idx === 0 ? '#FF6B6B' : idx === 1 ? '#45B7D1' : '#96CEB4',
+  }))
+})
 
 const dayMasterCityAnalysis = computed(() => {
   const bazi = enhancedBazi.value
@@ -735,14 +843,31 @@ function retakeTest() {
   router.push('/')
 }
 
-onMounted(() => {
-  if (!results) {
-    router.push('/')
-    return
+function goTakeTest() {
+  const invite = {
+    teamId: teamId.value,
+    fromName: sharedFromFriend.value?.private ? '匿名好友' : (sharedFromFriend.value?.name || '好友'),
   }
+  sessionStorage.setItem('cityfit_pending_invite', JSON.stringify(invite))
+  router.push('/info')
+}
 
+function acceptJoinTeam() {
+  showJoinPrompt.value = false
+  sessionStorage.removeItem('cityfit_pending_invite')
+}
+
+function declineJoinTeam() {
+  showJoinPrompt.value = false
+  sessionStorage.removeItem('cityfit_pending_invite')
+  teamMembers.value = []
+  sharedFromFriend.value = null
+}
+
+onMounted(() => {
   const dataParam = route.query.data as string
   const teamParam = route.query.team as string
+
   if (dataParam && teamParam) {
     try {
       const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
@@ -759,6 +884,26 @@ onMounted(() => {
       }
     } catch {
       console.warn('Failed to parse team data')
+    }
+  }
+
+  if (!results) {
+    if (sharedFromFriend.value) {
+      previewMode.value = true
+      return
+    }
+    router.push('/')
+    return
+  }
+
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      pendingTeamName.value = invite.fromName
+      showJoinPrompt.value = true
+    } catch {
+      sessionStorage.removeItem('cityfit_pending_invite')
     }
   }
 })
