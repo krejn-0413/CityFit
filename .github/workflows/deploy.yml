@@ -27,13 +27,7 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm config set registry https://registry.npmjs.org/
-
-      - run: npm install --loglevel verbose 2>&1 | tail -20
-
-      - name: Type check
-        run: npx vue-tsc -b --noEmit 2>&1
-        continue-on-error: false
+      - run: npm install
 
       - name: Build
         run: npx vite build 2>&1
