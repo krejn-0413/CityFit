@@ -498,21 +498,22 @@
       @click.self="declineJoinTeam"
     >
       <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center animate-scale-in">
-        <span class="text-4xl">🤝</span>
-        <h3 class="text-base font-bold text-gray-700 mt-3">加入小队</h3>
+        <span class="text-4xl">🗺️</span>
+        <h3 class="text-base font-bold text-gray-700 mt-3">小队地图已合并</h3>
         <p class="text-sm text-gray-500 mt-2">
-          是否加入「{{ pendingTeamName }}」的小队，一起在地图上点亮城市？
+          已展示「{{ pendingTeamName }}」的推荐城市，想正式加入TA的小队吗？
         </p>
+        <p class="text-xs text-gray-400 mt-1">加入后双方的地图数据会持续合并展示</p>
         <div class="flex gap-3 mt-5">
           <button @click="acceptJoinTeam"
             class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-2xl hover:shadow-md transition-all"
           >
-            ✅ 加入
+            ✅ 加入小队
           </button>
           <button @click="declineJoinTeam"
             class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-2xl hover:bg-gray-200 transition-all"
           >
-            不了
+            👀 仅看效果
           </button>
         </div>
       </div>
@@ -570,6 +571,12 @@ if (pending && results) {
   try {
     const invite = JSON.parse(pending)
     pendingTeamName.value = invite.fromName
+    if (invite.friendData) {
+      sharedFromFriend.value = invite.friendData
+    }
+    if (invite.membersData && invite.membersData.length > 0) {
+      teamMembers.value = invite.membersData
+    }
     showJoinPrompt.value = true
   } catch {
     sessionStorage.removeItem('cityfit_pending_invite')
@@ -896,8 +903,6 @@ function acceptJoinTeam() {
 function declineJoinTeam() {
   showJoinPrompt.value = false
   sessionStorage.removeItem('cityfit_pending_invite')
-  teamMembers.value = []
-  sharedFromFriend.value = null
 }
 
 onMounted(() => {
@@ -930,17 +935,6 @@ onMounted(() => {
     }
     router.push('/')
     return
-  }
-
-  const pending = sessionStorage.getItem('cityfit_pending_invite')
-  if (pending) {
-    try {
-      const invite = JSON.parse(pending)
-      pendingTeamName.value = invite.fromName
-      showJoinPrompt.value = true
-    } catch {
-      sessionStorage.removeItem('cityfit_pending_invite')
-    }
   }
 })
 </script>
