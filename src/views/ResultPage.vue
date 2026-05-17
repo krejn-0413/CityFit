@@ -544,15 +544,15 @@ const detailCardCity = ref<City | null>(null)
 const detailCardMatch = ref(0)
 const detailCardReason = ref('')
 
-const store = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
-const results = store.results
-const baziInfo = results?.baziInfo as BaziInfo | null
+const store = ref(JSON.parse(sessionStorage.getItem('cityfit') || '{}'))
+const results = ref(store.value.results)
+const baziInfo = ref(results.value?.baziInfo as BaziInfo | null)
 
-const topResults = ref<CityResult[]>(results?.topResults || [])
-const personalityTag = ref(results?.personalityTag || '城市探索家')
-const allScores = ref<Record<string, number>>(results?.allScores || {})
+const topResults = ref<CityResult[]>(results.value?.topResults || [])
+const personalityTag = ref(results.value?.personalityTag || '城市探索家')
+const allScores = ref<Record<string, number>>(results.value?.allScores || {})
 
-const teamId = ref(results?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
+const teamId = ref(results.value?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
 const teamMembers = ref<{ name: string; results: { cityId: string; cityName: string; matchPercentage: number }[] }[]>([])
 const showJoinInput = ref(false)
 const joinTeamCode = ref('')
@@ -561,31 +561,27 @@ const previewMode = ref(false)
 const showJoinPrompt = ref(false)
 const pendingTeamName = ref('')
 
-if (results && !results.teamId) {
-  results.teamId = teamId.value
-  sessionStorage.setItem('cityfit', JSON.stringify(store))
-}
-
-const pending = sessionStorage.getItem('cityfit_pending_invite')
-if (pending && results) {
-  try {
-    const invite = JSON.parse(pending)
-    pendingTeamName.value = invite.fromName
-    if (invite.friendData) {
-      sharedFromFriend.value = invite.friendData
+function loadResults() {
+  const s = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
+  store.value = s
+  results.value = s.results
+  baziInfo.value = (s.results?.baziInfo as BaziInfo) || null
+  if (s.results) {
+    topResults.value = s.results.topResults || []
+    personalityTag.value = s.results.personalityTag || '城市探索家'
+    allScores.value = s.results.allScores || {}
+    if (!s.results.teamId) {
+      s.results.teamId = teamId.value
+      sessionStorage.setItem('cityfit', JSON.stringify(s))
     }
-    if (invite.membersData && invite.membersData.length > 0) {
-      teamMembers.value = invite.membersData
-    }
-    showJoinPrompt.value = true
-  } catch {
-    sessionStorage.removeItem('cityfit_pending_invite')
   }
 }
 
+loadResults()
+
 const enhancedBazi = computed(() => {
-  if (!baziInfo) return null
-  return getEnhancedBaziInfo(baziInfo)
+  if (!baziInfo.value) return null
+  return getEnhancedBaziInfo(baziInfo.value)
 })
 
 const personalityProfile = computed<CityPersonality | null>(() => {
@@ -846,10 +842,10 @@ function joinTeam() {
   }
   const code = joinTeamCode.value.trim().toUpperCase()
   teamId.value = code
-  if (results) {
-    results.teamId = code
-    store.results = results
-    sessionStorage.setItem('cityfit', JSON.stringify(store))
+  if (results.value) {
+    results.value.teamId = code
+    store.value.results = results.value
+    sessionStorage.setItem('cityfit', JSON.stringify(store.value))
   }
   showJoinInput.value = false
   joinTeamCode.value = ''
@@ -890,10 +886,10 @@ function acceptJoinTeam() {
       if (invite.membersData && invite.membersData.length > 0) {
         teamMembers.value = invite.membersData
       }
-      if (results) {
-        results.teamId = invite.teamId
-        store.results = results
-        sessionStorage.setItem('cityfit', JSON.stringify(store))
+      if (results.value) {
+        results.value.teamId = invite.teamId
+        store.value.results = results.value
+        sessionStorage.setItem('cityfit', JSON.stringify(store.value))
       }
     } catch {}
   }
@@ -906,6 +902,8 @@ function declineJoinTeam() {
 }
 
 onMounted(() => {
+  loadResults()
+
   const dataParam = route.query.data as string
   const teamParam = route.query.team as string
 
@@ -928,13 +926,30 @@ onMounted(() => {
     }
   }
 
-  if (!results) {
+  if (!results.value) {
     if (sharedFromFriend.value) {
       previewMode.value = true
       return
     }
     router.push('/')
     return
+  }
+
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      pendingTeamName.value = invite.fromName
+      if (invite.friendData) {
+        sharedFromFriend.value = invite.friendData
+      }
+      if (invite.membersData && invite.membersData.length > 0) {
+        teamMembers.value = invite.membersData
+      }
+      showJoinPrompt.value = true
+    } catch {
+      sessionStorage.removeItem('cityfit_pending_invite')
+    }
   }
 })
 </script>
