@@ -565,6 +565,17 @@ if (results && !results.teamId) {
   sessionStorage.setItem('cityfit', JSON.stringify(store))
 }
 
+const pending = sessionStorage.getItem('cityfit_pending_invite')
+if (pending && results) {
+  try {
+    const invite = JSON.parse(pending)
+    pendingTeamName.value = invite.fromName
+    showJoinPrompt.value = true
+  } catch {
+    sessionStorage.removeItem('cityfit_pending_invite')
+  }
+}
+
 const enhancedBazi = computed(() => {
   if (!baziInfo) return null
   return getEnhancedBaziInfo(baziInfo)
@@ -847,6 +858,13 @@ function goTakeTest() {
   const invite = {
     teamId: teamId.value,
     fromName: sharedFromFriend.value?.private ? '匿名好友' : (sharedFromFriend.value?.name || '好友'),
+    friendData: sharedFromFriend.value,
+    membersData: teamMembers.value.map(m => ({
+      name: m.name,
+      private: false,
+      teamId: teamId.value,
+      results: m.results,
+    })),
   }
   sessionStorage.setItem('cityfit_pending_invite', JSON.stringify(invite))
   router.push('/info')
@@ -854,6 +872,24 @@ function goTakeTest() {
 
 function acceptJoinTeam() {
   showJoinPrompt.value = false
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      teamId.value = invite.teamId
+      if (invite.friendData) {
+        sharedFromFriend.value = invite.friendData
+      }
+      if (invite.membersData && invite.membersData.length > 0) {
+        teamMembers.value = invite.membersData
+      }
+      if (results) {
+        results.teamId = invite.teamId
+        store.results = results
+        sessionStorage.setItem('cityfit', JSON.stringify(store))
+      }
+    } catch {}
+  }
   sessionStorage.removeItem('cityfit_pending_invite')
 }
 
