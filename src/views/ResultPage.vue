@@ -208,7 +208,7 @@
 
         <div class="mt-4 space-y-3">
           <div class="bg-white/60 rounded-2xl p-4 border border-white">
-            <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">👥 小队系统 · 组队点亮地图</h4>
+            <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">👥 分享结果 · 邀请好友一起点亮地图</h4>
 
             <div class="flex items-center justify-center gap-2 mb-4">
               <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
@@ -222,7 +222,7 @@
                 class="flex-1 py-2.5 rounded-2xl text-sm font-bold shadow-sm hover:shadow-md transition-all"
                 :class="copyStatus === 'copied' ? 'bg-green-500 text-white' : copyStatus === 'error' ? 'bg-red-400 text-white' : 'bg-gradient-to-r from-secondary to-accent text-white'"
               >
-                {{ copyStatus === 'copied' ? '✅ 已复制到剪贴板！' : copyStatus === 'error' ? '❌ 复制失败' : '🔗 复制小队链接' }}
+                {{ copyStatus === 'copied' ? '✅ 链接已复制！' : copyStatus === 'error' ? '❌ 复制失败' : '🔗 分享我的结果' }}
               </button>
               <button @click="showJoinInput = !showJoinInput"
                 class="px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-600 text-sm font-bold rounded-2xl hover:border-secondary hover:text-secondary transition-all"
@@ -755,7 +755,7 @@ function generateShareLink(): string {
   }))
   const allData = [data, ...currentTeamData]
   const encoded = btoa(encodeURIComponent(JSON.stringify(allData)))
-  const shareUrl = `${window.location.origin}${window.location.pathname}?team=${teamId.value}&data=${encoded}`
+  const shareUrl = `${window.location.origin}${window.location.pathname}#/result?team=${teamId.value}&data=${encoded}`
   return shareUrl
 }
 
