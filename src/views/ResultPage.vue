@@ -206,6 +206,28 @@
           />
         </div>
 
+        <div v-if="showMergeBanner" class="animate-fade-in bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200 shadow-sm">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-2xl">🗺️</span>
+            <div>
+              <p class="text-sm font-bold text-gray-700">已展示「{{ pendingTeamName }}」的推荐城市</p>
+              <p class="text-xs text-gray-500">想正式加入TA的小队，让地图持续合并展示吗？</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button @click="acceptJoinTeam"
+              class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-xl hover:shadow-md transition-all"
+            >
+              ✅ 加入小队
+            </button>
+            <button @click="declineJoinTeam"
+              class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all"
+            >
+              👀 仅看效果
+            </button>
+          </div>
+        </div>
+
         <div class="mt-4 space-y-3">
           <div class="bg-white/60 rounded-2xl p-4 border border-white">
             <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">👥 分享结果 · 邀请好友一起点亮地图</h4>
@@ -492,33 +514,6 @@
 
     </template>
 
-    <!-- 加入小队弹窗 -->
-    <div v-if="showJoinPrompt"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
-      @click.self="declineJoinTeam"
-    >
-      <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center animate-scale-in">
-        <span class="text-4xl">🗺️</span>
-        <h3 class="text-base font-bold text-gray-700 mt-3">小队地图已合并</h3>
-        <p class="text-sm text-gray-500 mt-2">
-          已展示「{{ pendingTeamName }}」的推荐城市，想正式加入TA的小队吗？
-        </p>
-        <p class="text-xs text-gray-400 mt-1">加入后双方的地图数据会持续合并展示</p>
-        <div class="flex gap-3 mt-5">
-          <button @click="acceptJoinTeam"
-            class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-2xl hover:shadow-md transition-all"
-          >
-            ✅ 加入小队
-          </button>
-          <button @click="declineJoinTeam"
-            class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-2xl hover:bg-gray-200 transition-all"
-          >
-            👀 仅看效果
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
@@ -558,7 +553,7 @@ const showJoinInput = ref(false)
 const joinTeamCode = ref('')
 
 const previewMode = ref(false)
-const showJoinPrompt = ref(false)
+const showMergeBanner = ref(false)
 const pendingTeamName = ref('')
 
 function loadResults() {
@@ -874,7 +869,7 @@ function goTakeTest() {
 }
 
 function acceptJoinTeam() {
-  showJoinPrompt.value = false
+  showMergeBanner.value = false
   const pending = sessionStorage.getItem('cityfit_pending_invite')
   if (pending) {
     try {
@@ -897,7 +892,7 @@ function acceptJoinTeam() {
 }
 
 function declineJoinTeam() {
-  showJoinPrompt.value = false
+  showMergeBanner.value = false
   sessionStorage.removeItem('cityfit_pending_invite')
 }
 
@@ -946,7 +941,7 @@ onMounted(() => {
       if (invite.membersData && invite.membersData.length > 0) {
         teamMembers.value = invite.membersData
       }
-      showJoinPrompt.value = true
+      showMergeBanner.value = true
     } catch {
       sessionStorage.removeItem('cityfit_pending_invite')
     }
