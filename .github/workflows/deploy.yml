@@ -27,7 +27,9 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm ci
+      - run: npm config set registry https://registry.npmjs.org/
+
+      - run: npm install --loglevel verbose 2>&1 | head -100
 
       - run: npm run build
 
