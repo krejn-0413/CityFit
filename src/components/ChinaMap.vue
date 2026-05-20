@@ -22,12 +22,12 @@
       </button>
     </div>
 
-    <div v-show="mapState === 'ready'" class="relative flex items-center justify-center" style="min-height: 500px">
-      <div ref="mapContainerRef" class="relative" style="width: 100%; max-width: 700px;">
+    <div v-show="mapState === 'ready'" class="relative flex items-center justify-center w-full h-full">
+      <div ref="mapContainerRef" class="relative w-full h-full flex items-center justify-center">
         <img
           :src="mapSvgUrl"
           alt="中国地图"
-          class="w-full h-auto block"
+          class="max-w-full max-h-full block object-contain"
           @load="onMapLoaded"
           @error="onMapError"
         />

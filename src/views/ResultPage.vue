@@ -33,7 +33,7 @@
             </div>
           </div>
           <!-- Preview map -->
-          <div class="h-[300px] w-full border border-border-subtle overflow-hidden mt-6 animate-reveal stagger-5">
+          <div class="h-[300px] w-full overflow-hidden mt-6 animate-reveal stagger-5">
             <ChinaMap
               :top-cities="[]"
               :merged-points="previewMapCities"
@@ -320,7 +320,7 @@
             </div>
           </div>
 
-          <div class="h-[420px] w-full border border-border-subtle overflow-hidden animate-reveal stagger-3">
+          <div class="h-[420px] w-full overflow-hidden animate-reveal stagger-3">
             <ChinaMap
               :top-cities="mapTopCities"
               :merged-points="mapMergedPoints"
