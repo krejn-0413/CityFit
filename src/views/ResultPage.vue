@@ -33,7 +33,7 @@
             </div>
           </div>
           <!-- Preview map -->
-          <div class="h-[300px] w-full overflow-hidden mt-6 animate-reveal stagger-5">
+          <div class="h-[25vh] min-h-[180px] w-full overflow-hidden mt-6 animate-reveal stagger-5">
             <ChinaMap
               :top-cities="[]"
               :merged-points="previewMapCities"
@@ -302,8 +302,9 @@
 
           <div class="flex items-stretch justify-center gap-3 mb-8 animate-reveal stagger-2">
             <div v-for="(r, idx) in topResults" :key="r.city.id"
-              class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 card py-3 relative overflow-hidden"
+              class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 card py-3 relative overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
               :class="idx === 0 ? 'border-gold/30' : ''"
+              @click="showCityDetail(r.city)"
             >
               <div class="absolute top-0 left-0 right-0 h-0.5 bg-gold" v-if="idx === 0"></div>
               <div class="w-8 h-8 flex items-center justify-center text-xs font-bold"
@@ -320,7 +321,7 @@
             </div>
           </div>
 
-          <div class="h-[420px] w-full overflow-hidden animate-reveal stagger-3">
+          <div class="h-[38vh] min-h-[300px] w-full overflow-hidden animate-reveal stagger-3">
             <ChinaMap
               :top-cities="mapTopCities"
               :merged-points="mapMergedPoints"
