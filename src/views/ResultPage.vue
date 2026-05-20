@@ -12,22 +12,14 @@
             </p>
             <p class="text-caption text-text-muted mt-1">分享了TA的城市测评，来看看TA的本命城市！</p>
           </div>
-          <div class="flex justify-center gap-3 mt-6 animate-reveal stagger-1">
-            <button @click="goTakeTest" class="btn-primary text-caption">
-              我也测一测
-            </button>
-            <button @click="previewMode = false" class="btn-secondary text-caption px-4">
-              仅看效果
-            </button>
-          </div>
           <!-- Friend's top cities preview -->
           <div class="mt-8">
             <h3 class="font-display text-section text-text-primary mb-4 text-center">
-              🏆 {{ sharedFromFriend?.private ? 'TA' : sharedFromFriend?.name }} 的 Top 城市
+              {{ sharedFromFriend?.private ? 'TA' : sharedFromFriend?.name }} 的 Top 城市
             </h3>
-            <div v-for="(r, idx) in (sharedFromFriend?.results || [])" :key="r.cityId"
+            <div v-for="(r, idx) in previewFriendCities" :key="r.cityId"
               class="card-hover mb-3 animate-reveal"
-              :class="'stagger-' + (idx + 2)"
+              :class="'stagger-' + (idx + 1)"
             >
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 flex items-center justify-center text-lg font-bold shrink-0"
@@ -44,12 +36,16 @@
           <div class="h-[300px] w-full border border-border-subtle overflow-hidden mt-6 animate-reveal stagger-5">
             <ChinaMap
               :top-cities="[]"
-              :merged-points="(sharedFromFriend?.results || []).map(r => ({ name: r.cityName, value: r.matchPercentage }))"
+              :merged-points="previewMapCities"
               :team-id="teamId"
-              :show-team-label="false"
+              :show-team-label="true"
               @city-click="showCityDetail"
             />
           </div>
+          <div class="flex justify-center mt-8 animate-reveal stagger-6">
+            <button @click="goTakeTest" class="btn-primary text-caption">我也测一测</button>
+          </div>
+          <p class="text-fine text-text-muted text-center mt-3">完成测试后，可以选择加入TA的小队一起点亮地图！</p>
           <footer class="py-10 text-center">
             <p class="text-fine text-text-faint tracking-widest">娱乐测评 · 仅供开心</p>
           </footer>
@@ -112,7 +108,7 @@
                 :city-name="topResults[0]?.city.name || ''"
                 :color="personalityProfile.color"
                 :tag="personalityProfile.tag"
-                :emoji="personalityProfile.icon || personalityProfile.emoji"
+                :emoji="personalityProfile.icon || personalityProfile.emoji || ''"
               />
             </div>
             <div class="inline-flex items-center gap-2 px-5 py-2 card mb-4">
@@ -335,41 +331,31 @@
             />
           </div>
 
+          <!-- Merge banner (repeated for users scrolling directly to page 4) -->
+          <div v-if="showMergeBanner" class="card border-gold/20 animate-reveal mt-4">
+            <div class="flex items-center gap-3 mb-4">
+              <IconSprite name="map" size="24" />
+              <div>
+                <p class="text-caption text-text-primary font-bold">已展示「{{ pendingTeamName }}」的推荐城市</p>
+                <p class="text-fine text-text-muted mt-1">想正式加入TA的小队，让地图持续合并展示吗？</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button @click="acceptJoinTeam" class="btn-primary flex-1 text-caption">
+                加入小队
+              </button>
+              <button @click="declineJoinTeam" class="btn-secondary text-caption px-4">
+                仅看效果
+              </button>
+            </div>
+          </div>
+
           <div class="mt-8 card animate-reveal stagger-4">
-            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">小队系统 · 组队点亮地图</h4>
+            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">分享结果 · 邀请好友一起点亮地图</h4>
 
             <div class="flex items-center justify-center gap-2 mb-5">
               <span class="tag-active">小队 {{ teamId }}</span>
-              <span class="text-caption text-text-muted">&middot; {{ (sharedFromFriend ? 1 : 0) + teamMembers.length + 1 }} 人</span>
-            </div>
-
-            <!-- Team member list -->
-            <div v-if="sharedFromFriend || teamMembers.length > 0" class="mb-5 space-y-2">
-              <div class="text-caption text-text-muted mb-2 text-center">队员城市一览</div>
-              <!-- Current user -->
-              <div class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-gold/30">
-                <span class="w-2 h-2 rounded-full bg-gold shrink-0"></span>
-                <span class="text-caption text-text-primary font-bold">我</span>
-                <span class="text-fine text-text-muted ml-auto">
-                  <span v-for="(r, i) in topResults.slice(0,2)" :key="i">{{ r.city.name }}{{ i < Math.min(topResults.length,2)-1 ? '、' : '' }}</span>
-                </span>
-              </div>
-              <!-- Shared friend -->
-              <div v-if="sharedFromFriend" class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-border-subtle">
-                <span class="w-2 h-2 rounded-full bg-gold/50 shrink-0"></span>
-                <span class="text-caption text-text-primary font-bold">{{ sharedFromFriend.private ? '匿名' : sharedFromFriend.name }}</span>
-                <span class="text-fine text-text-muted ml-auto">
-                  <span v-for="(r, i) in sharedFromFriend.results.slice(0,2)" :key="i">{{ r.cityName }}{{ i < Math.min(sharedFromFriend.results.length,2)-1 ? '、' : '' }}</span>
-                </span>
-              </div>
-              <!-- Other team members -->
-              <div v-for="m in teamMembers" :key="m.name" class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-border-subtle">
-                <span class="w-2 h-2 rounded-full bg-gold/30 shrink-0"></span>
-                <span class="text-caption text-text-primary font-bold">{{ m.name }}</span>
-                <span class="text-fine text-text-muted ml-auto">
-                  <span v-for="(r, i) in m.results.slice(0,2)" :key="i">{{ r.cityName }}{{ i < Math.min(m.results.length,2)-1 ? '、' : '' }}</span>
-                </span>
-              </div>
+              <span class="text-caption text-text-muted">&middot; {{ teamMembers.length + 1 }} 人</span>
             </div>
 
             <div class="flex gap-2 mb-5">
@@ -377,7 +363,7 @@
                 class="btn-primary flex-1 text-caption"
                 :class="{ 'bg-green-500': copyStatus === 'copied', 'bg-red-400': copyStatus === 'error' }"
               >
-                {{ copyStatus === 'copied' ? '已复制到剪贴板！' : copyStatus === 'error' ? '复制失败' : '复制小队链接' }}
+                {{ copyStatus === 'copied' ? '已复制到剪贴板！' : copyStatus === 'error' ? '复制失败' : '分享我的结果' }}
               </button>
               <button @click="showJoinInput = !showJoinInput" class="btn-secondary text-caption px-4">
                 加入小队
@@ -385,9 +371,9 @@
             </div>
 
             <div v-if="showJoinInput" class="mb-5 p-4 bg-canvas-overlay">
-              <p class="text-caption text-text-muted mb-3">粘贴好友的分享链接或输入小队码，加入后你们的地图会合并显示：</p>
+              <p class="text-caption text-text-muted mb-3">输入对方的小队码，加入后你们的地图会合并显示：</p>
               <div class="flex gap-2">
-                <input v-model="joinTeamCode" type="text" placeholder="粘贴分享链接或输入小队码"
+                <input v-model="joinTeamCode" type="text" placeholder="输入小队码"
                   class="text-input flex-1 text-center"
                 />
                 <button @click="joinTeam" class="btn-primary text-caption">加入</button>
@@ -399,11 +385,11 @@
             <div class="flex items-center justify-center gap-2 mb-4">
               <span class="text-caption text-text-muted">匿名</span>
               <button @click="privateMode = !privateMode"
-                class="relative w-12 h-6 rounded-pill transition-colors duration-300"
+                class="relative w-12 h-6 rounded-pill transition-colors duration-300 overflow-hidden"
                 :class="privateMode ? 'bg-canvas-overlay border border-border-subtle' : 'bg-gold'"
               >
-                <span class="absolute top-0.5 w-5 h-5 bg-gold rounded-full shadow-md transition-transform duration-300"
-                  :class="privateMode ? 'translate-x-0' : 'translate-x-6'"
+                <span class="absolute left-0.5 top-0.5 w-5 h-5 bg-gold rounded-full shadow-md transition-transform duration-300"
+                  :class="privateMode ? 'translate-x-0' : 'translate-x-[22px]'"
                 ></span>
               </button>
               <span class="text-caption text-text-muted">昵称</span>
@@ -416,7 +402,7 @@
           </div>
         </div>
 
-        <div>
+        <div class="mt-12">
           <div class="flex items-center gap-3 justify-center mb-10 animate-reveal">
             <div class="gold-line"></div>
             <h3 class="font-display text-section text-text-primary">你的 Top 3 城市</h3>
@@ -513,7 +499,7 @@ import ChinaMap from '../components/ChinaMap.vue'
 import CityPersonaImage from '../components/CityPersonaImage.vue'
 import CityDetailCard from '../components/CityDetailCard.vue'
 import IconSprite from '../components/IconSprite.vue'
-import { getEnhancedBaziInfo, WUXING_COLORS, WUXING_ICONS } from '../composables/useBazi'
+import { getEnhancedBaziInfo, WUXING_COLORS, WUXING_EMOJI, WUXING_ICONS } from '../composables/useBazi'
 import { cities, cityPersonalities } from '../data/cities'
 import type { CityResult, SharedUserData, BaziInfo, CityPersonality, City } from '../types'
 
@@ -546,63 +532,44 @@ const detailCardCity = ref<City | null>(null)
 const detailCardMatch = ref(0)
 const detailCardReason = ref('')
 
-const HUMOR_CITIES = ['beijing', 'shanghai', 'chengdu']
+const store = ref(JSON.parse(sessionStorage.getItem('cityfit') || '{}'))
+const results = ref(store.value.results)
+const baziInfo = ref(results.value?.baziInfo as BaziInfo | null)
 
-const store = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
-const results = store.results
-const baziInfo = results?.baziInfo as BaziInfo | null
+const topResults = ref<CityResult[]>(results.value?.topResults || [])
+const personalityTag = ref(results.value?.personalityTag || '城市探索家')
+const allScores = ref<Record<string, number>>(results.value?.allScores || {})
 
-const topResults = ref<CityResult[]>(results?.topResults || [])
-const personalityTag = ref(results?.personalityTag || '城市探索家')
-const allScores = ref<Record<string, number>>(results?.allScores || {})
-
-// Use pending team from localStorage (survives quiz flow), else results.teamId, else new random
-const pendingTeam = localStorage.getItem('cityfit_pending_team') || ''
-const teamId = ref(pendingTeam || results?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
+const teamId = ref(results.value?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
 const teamMembers = ref<{ name: string; results: { cityId: string; cityName: string; matchPercentage: number }[] }[]>([])
 const showJoinInput = ref(false)
 const joinTeamCode = ref('')
 
-// ── Remote team features: preview mode + merge banner ──
 const previewMode = ref(false)
 const showMergeBanner = ref(false)
 const pendingTeamName = ref('')
 
-if (results && !results.teamId) {
-  results.teamId = teamId.value
-  sessionStorage.setItem('cityfit', JSON.stringify(store))
+function loadResults() {
+  const s = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
+  store.value = s
+  results.value = s.results
+  baziInfo.value = (s.results?.baziInfo as BaziInfo) || null
+  if (s.results) {
+    topResults.value = s.results.topResults || []
+    personalityTag.value = s.results.personalityTag || '城市探索家'
+    allScores.value = s.results.allScores || {}
+    if (!s.results.teamId) {
+      s.results.teamId = teamId.value
+      sessionStorage.setItem('cityfit', JSON.stringify(s))
+    }
+  }
 }
 
-// ── Auto-join pending team if returning from quiz ──
-if (pendingTeam && results) {
-  // Clear the pending flag immediately
-  localStorage.removeItem('cityfit_pending_team')
-  // Auto-join in background
-  const myData = {
-    name: shareName.value || '我的好友',
-    private: privateMode.value,
-    teamId: pendingTeam,
-    results: topResults.value.map(r => ({
-      cityId: r.city.id,
-      cityName: r.city.name,
-      matchPercentage: r.matchPercentage,
-    })),
-  }
-  apiJoinTeam(pendingTeam, myData).then(result => {
-    if (result?.team?.members) {
-      const others = result.team.members.filter((m: any) => m.name !== myData.name)
-      if (others.length > 0) {
-        sharedFromFriend.value = others[0]
-      }
-      teamMembers.value = others.slice(1)
-      persistTeamData()
-    }
-  }).catch(() => {})
-}
+loadResults()
 
 const enhancedBazi = computed(() => {
-  if (!baziInfo) return null
-  return getEnhancedBaziInfo(baziInfo)
+  if (!baziInfo.value) return null
+  return getEnhancedBaziInfo(baziInfo.value)
 })
 
 const personalityProfile = computed<CityPersonality | null>(() => {
@@ -614,13 +581,13 @@ const personalityProfile = computed<CityPersonality | null>(() => {
   return null
 })
 
+const personalityEmoji = computed(() => {
+  return topResults.value[0]?.city.emoji || '🏙️'
+})
+
 const personalityAssetSrc = computed(() => {
   const topCity = topResults.value[0]?.city
-  if (!topCity) return ''
-  if (HUMOR_CITIES.includes(topCity.id)) {
-    return `/assets/humor_cities_personas_images/${topCity.id}.png`
-  }
-  return `/assets/personas/${topCity.id}.png`
+  return topCity ? `${import.meta.env.BASE_URL}assets/personas/${topCity.id}.png` : ''
 })
 
 const radarScores = computed(() => {
@@ -657,8 +624,21 @@ const mapTopCities = computed(() => {
   return topResults.value.map(r => ({
     name: r.city.name,
     value: r.matchPercentage,
-    color: r === topResults.value[0] ? '#F0B90B' : r === topResults.value[1] ? '#9B9B9B' : '#6B6B6B',
+    color: r === topResults.value[0] ? '#FF6B6B' : r === topResults.value[1] ? '#45B7D1' : '#96CEB4',
   }))
+})
+
+const mapMergedPoints = computed(() => {
+  const points: { name: string; value: number }[] = []
+  teamMembers.value.forEach(m => {
+    m.results.forEach(r => {
+      const city = cities.find(c => c.id === r.cityId)
+      if (city) {
+        points.push({ name: city.name, value: r.matchPercentage })
+      }
+    })
+  })
+  return points
 })
 
 // Detect cities that overlap between current user and team members (for map highlight)
@@ -672,32 +652,24 @@ const mapOverlapCities = computed(() => {
     m.results.forEach(r => teamCities.add(r.cityName))
   })
   const overlap = new Set([...myCities].filter(c => teamCities.has(c)))
-  // Return as map points with highlight styling
   return [...overlap].map(name => ({ name, value: 100 }))
 })
 
-const mapMergedPoints = computed(() => {
-  const points: { name: string; value: number }[] = []
+const sharedFromFriend = ref<SharedUserData | null>(null)
 
-  // Friend who shared the link (banner user)
-  if (sharedFromFriend.value) {
-    sharedFromFriend.value.results.forEach(r => {
-      const city = cities.find(c => c.id === r.cityId)
-      if (city) points.push({ name: city.name, value: r.matchPercentage })
-    })
-  }
-
-  // Other team members
-  teamMembers.value.forEach(m => {
-    m.results.forEach(r => {
-      const city = cities.find(c => c.id === r.cityId)
-      if (city) points.push({ name: city.name, value: r.matchPercentage })
-    })
-  })
-  return points
+const previewFriendCities = computed(() => {
+  if (!sharedFromFriend.value) return []
+  return sharedFromFriend.value.results
 })
 
-const sharedFromFriend = ref<SharedUserData | null>(null)
+const previewMapCities = computed(() => {
+  if (!sharedFromFriend.value) return []
+  return sharedFromFriend.value.results.map((r, idx) => ({
+    name: r.cityName,
+    value: r.matchPercentage,
+    color: idx === 0 ? '#FF6B6B' : idx === 1 ? '#45B7D1' : '#96CEB4',
+  }))
+})
 
 const dayMasterCityAnalysis = computed(() => {
   const bazi = enhancedBazi.value
@@ -707,12 +679,12 @@ const dayMasterCityAnalysis = computed(() => {
   const cityPrefs = city.baziPreference
   const matchCount = cityPrefs.filter(e => bazi.likes.includes(e)).length
   if (matchCount >= 2) {
-    return `你的日主为${dayWuxing}，而你的本命城市「${city.name}」的五行偏好（${cityPrefs.join('、')}）与你的喜用神（${bazi.likes.join('、')}）高度匹配！这表明${city.name}的气场对你的八字有正向的加持作用，居住或常去这座城市会对你的整体运势产生积极影响。你的${dayWuxing}性人格特质也能在这座城市得到最好的发挥和释放。`
+    return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，而你的本命城市「${city.name}」的五行偏好（${cityPrefs.join('、')}）与你的喜用神（${bazi.likes.join('、')}）高度匹配！这表明${city.name}的气场对你的八字有正向的加持作用，居住或常去这座城市会对你的整体运势产生积极影响。你的${dayWuxing}性人格特质也能在这座城市得到最好的发挥和释放。`
   }
   if (matchCount === 1) {
-    return `你的日主为${dayWuxing}，「${city.name}」的五行偏好中包含你的喜用神${cityPrefs.filter(e => bazi.likes.includes(e)).join('、')}，有一定的正向作用。同时这座城市也有其他元素特质，整体来说是一个不错的选择。`
+    return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，「${city.name}」的五行偏好中包含你的喜用神${cityPrefs.filter(e => bazi.likes.includes(e)).join('、')}，有一定的正向作用。同时这座城市也有其他元素特质，整体来说是一个不错的选择。`
   }
-    return `你的日主为${dayWuxing}，「${city.name}」的五行偏好与你的喜用神匹配度不高，但这并不意味着不合适。城市的选择是多维度的，物质和精神层面的契合同样重要。建议你多关注下文其他维度的分析。`
+  return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，「${city.name}」的五行偏好与你的喜用神匹配度不高，但这并不意味着不合适。城市的选择是多维度的，物质和精神层面的契合同样重要。建议你多关注下文其他维度的分析。`
 })
 
 const cityWuxingMatchText = computed(() => {
@@ -721,7 +693,7 @@ const cityWuxingMatchText = computed(() => {
   if (!city || !bazi) return ''
   const matched = city.baziPreference.filter(e => bazi.likes.includes(e))
   const unmatched = city.baziPreference.filter(e => bazi.dislikes.includes(e))
-  if (matched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）与喜用神（${matched.join('、')}）相合`
+  if (matched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）与喜用神（${matched.join('、')}）相合 ✨`
   if (unmatched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）包含忌神元素，建议综合考量`
   return '的五行属性较为中性'
 })
@@ -757,6 +729,10 @@ const couplePalaceCityAnalysis = computed(() => {
 
 function getWuxingColor(wuxing: string): string {
   return WUXING_COLORS[wuxing] || '#9CA3AF'
+}
+
+function getWuxingEmoji(wuxing: string): string {
+  return WUXING_EMOJI[wuxing] || '✨'
 }
 
 function getWuxingIcon(wuxing: string): string {
@@ -823,14 +799,21 @@ function generateShareLink(): string {
       matchPercentage: r.matchPercentage,
     })),
   }
+  const currentTeamData = teamMembers.value.map(m => ({
+    name: m.name,
+    private: false,
+    teamId: teamId.value,
+    results: m.results,
+  }))
+  const allData = [data, ...currentTeamData]
+  const encoded = btoa(encodeURIComponent(JSON.stringify(allData)))
   // Also post to backend (fire-and-forget in background)
   apiCreateTeam(teamId.value, data).catch(() => {})
-  
-  const shareUrl = `${window.location.origin}${window.location.pathname}?team=${teamId.value}`
+  const shareUrl = `${window.location.origin}${window.location.pathname}#/result?team=${teamId.value}&data=${encoded}`
   return shareUrl
 }
 
-// --- Team data persistence (localStorage) ---
+// ── Team data persistence (localStorage) ──
 const TEAM_STORAGE_KEY = 'cityfit_team'
 
 function persistTeamData() {
@@ -925,108 +908,29 @@ async function copyTeamLink() {
   setTimeout(() => { copyStatus.value = 'idle' }, 2500)
 }
 
-async function joinTeam() {
-  const input = joinTeamCode.value.trim()
-  if (!input) {
-    alert('请输入小队码或分享链接')
+function joinTeam() {
+  if (!joinTeamCode.value.trim()) {
+    alert('请输入小队码')
     return
   }
-
-  let code = input.toUpperCase()
-
-  // Try to parse as a full share URL (extract team code)
-  try {
-    const url = new URL(input)
-    const teamParam = url.searchParams.get('team')
-    if (teamParam) code = teamParam
-  } catch {
-    // Not a URL, treat as plain team code
-  }
-
-  // Set team ID
+  const code = joinTeamCode.value.trim().toUpperCase()
   teamId.value = code
-  if (results) {
-    results.teamId = code
-    store.results = results
-    sessionStorage.setItem('cityfit', JSON.stringify(store))
+  if (results.value) {
+    results.value.teamId = code
+    store.value.results = results.value
+    sessionStorage.setItem('cityfit', JSON.stringify(store.value))
   }
-
-  // Post this user's results to backend
-  const myData = {
-    name: privateMode.value ? '匿名用户' : (shareName.value || '我的好友'),
-    private: privateMode.value,
-    teamId: code,
-    results: topResults.value.map(r => ({
-      cityId: r.city.id,
-      cityName: r.city.name,
-      matchPercentage: r.matchPercentage,
-    })),
-  }
-
-  try {
-    const result = await apiJoinTeam(code, myData)
-    // Update team members from backend response
-    if (result.team?.members) {
-      const others = result.team.members.filter((m: any) => m.name !== myData.name)
-      if (others.length > 0) {
-        sharedFromFriend.value = others[0]
-      }
-      teamMembers.value = others.slice(1)
-    }
-  } catch {
-    // Backend unavailable, fall through to URL-based
-  }
-
-  persistTeamData()
   showJoinInput.value = false
   joinTeamCode.value = ''
-
-  const newUrl = generateShareLink()
-  manualCopyUrl.value = newUrl
-  showUrlModal.value = true
+  alert(`✅ 已加入小队「${code}」！对方的小队链接中将包含你的数据`)
 }
 
-function acceptJoinTeam() {
-  showMergeBanner.value = false
-  const pending = sessionStorage.getItem('cityfit_pending_invite')
-  if (pending) {
-    try {
-      const invite = JSON.parse(pending)
-      if (invite.friendData) {
-        sharedFromFriend.value = invite.friendData
-      }
-      if (invite.membersData?.length) {
-        teamMembers.value = invite.membersData
-      }
-      if (invite.teamId) {
-        teamId.value = invite.teamId
-      }
-      sessionStorage.removeItem('cityfit_pending_invite')
-      persistTeamData()
-      // Also post to backend
-      const myData = {
-        name: privateMode.value ? '匿名用户' : (shareName.value || '我的好友'),
-        private: privateMode.value,
-        teamId: invite.teamId,
-        results: topResults.value.map(r => ({
-          cityId: r.city.id, cityName: r.city.name, matchPercentage: r.matchPercentage,
-        })),
-      }
-      apiCreateTeam(invite.teamId, myData).catch(() => {})
-    } catch {
-      sessionStorage.removeItem('cityfit_pending_invite')
-    }
-  }
+function retakeTest() {
+  sessionStorage.removeItem('cityfit')
+  router.push('/')
 }
 
-function declineJoinTeam() {
-  showMergeBanner.value = false
-  sessionStorage.removeItem('cityfit_pending_invite')
-}
-
-// Save pending invite before navigating to quiz (called from preview mode)
 function goTakeTest() {
-  previewMode.value = false
   const invite = {
     teamId: teamId.value,
     fromName: sharedFromFriend.value?.private ? '匿名好友' : (sharedFromFriend.value?.name || '好友'),
@@ -1039,60 +943,64 @@ function goTakeTest() {
     })),
   }
   sessionStorage.setItem('cityfit_pending_invite', JSON.stringify(invite))
-  localStorage.setItem('cityfit_pending_team', teamId.value)
   router.push('/info')
 }
 
-function retakeTest() {
-  sessionStorage.removeItem('cityfit')
-  router.push('/')
+function acceptJoinTeam() {
+  showMergeBanner.value = false
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      teamId.value = invite.teamId
+      if (invite.friendData) {
+        sharedFromFriend.value = invite.friendData
+      }
+      if (invite.membersData && invite.membersData.length > 0) {
+        teamMembers.value = invite.membersData
+      }
+      if (results.value) {
+        results.value.teamId = invite.teamId
+        store.value.results = results.value
+        sessionStorage.setItem('cityfit', JSON.stringify(store.value))
+      }
+    } catch {}
+  }
+  sessionStorage.removeItem('cityfit_pending_invite')
+}
+
+function declineJoinTeam() {
+  showMergeBanner.value = false
+  sessionStorage.removeItem('cityfit_pending_invite')
 }
 
 onMounted(() => {
-  if (!results) {
-    // Preview mode: visitor from shared link, no test results yet
-    const teamParam = route.query.team as string
-    const dataParam = route.query.data as string
-    if (teamParam && dataParam) {
-      previewMode.value = true
-      teamId.value = teamParam
-      localStorage.setItem('cityfit_pending_team', teamParam)
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
-        if (Array.isArray(decoded) && decoded.length > 0) {
-          sharedFromFriend.value = decoded[0] as SharedUserData
-          if (decoded.length > 1) teamMembers.value = decoded.slice(1)
-        }
-      } catch { /* ignore */ }
-      return
-    }
-    router.push('/')
-    return
-  }
-
-  // Restore team data from localStorage
+  loadResults()
   loadTeamData()
 
-  // Check for pending invite (from quiz flow after visiting shared link)
-  const pendingInvite = sessionStorage.getItem('cityfit_pending_invite')
-  if (pendingInvite) {
-    try {
-      const invite = JSON.parse(pendingInvite)
-      pendingTeamName.value = invite.fromName || '好友'
-      if (invite.friendData) sharedFromFriend.value = invite.friendData
-      if (invite.membersData?.length) teamMembers.value = invite.membersData
-      if (invite.teamId) teamId.value = invite.teamId
-      showMergeBanner.value = true
-      persistTeamData()
-    } catch {
-      sessionStorage.removeItem('cityfit_pending_invite')
-    }
-  }
-
+  const dataParam = route.query.data as string
   const teamParam = route.query.team as string
-  if (teamParam) {
+
+  if (dataParam && teamParam) {
+    try {
+      const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
+      if (Array.isArray(decoded)) {
+        const members = decoded as SharedUserData[]
+        if (members.length > 0) {
+          sharedFromFriend.value = members[0]
+          teamId.value = teamParam
+          teamMembers.value = members.map(m => ({
+            name: m.name,
+            results: m.results,
+          }))
+        }
+      }
+    } catch {
+      console.warn('Failed to parse team data')
+    }
+  } else if (teamParam) {
+    // Fallback: try backend API (newer URL format without data param)
     teamId.value = teamParam
-    localStorage.setItem('cityfit_pending_team', teamParam)
     apiGetTeam(teamParam).then(result => {
       if (result?.team?.members) {
         const members = result.team.members
@@ -1101,19 +1009,35 @@ onMounted(() => {
         persistTeamData()
       }
     }).catch(() => {})
+  }
 
-    const dataParam = route.query.data as string
-    if (dataParam) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
-        if (Array.isArray(decoded) && decoded.length > 0) {
-          if (!sharedFromFriend.value) sharedFromFriend.value = decoded[0] as SharedUserData
-          if (decoded.length > 1 && teamMembers.value.length === 0) teamMembers.value = decoded.slice(1)
-          persistTeamData()
-        }
-      } catch { /* ignore */ }
+  if (!results.value) {
+    if (sharedFromFriend.value) {
+      previewMode.value = true
+      return
+    }
+    router.push('/')
+    return
+  }
+
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      pendingTeamName.value = invite.fromName
+      if (invite.friendData) {
+        sharedFromFriend.value = invite.friendData
+      }
+      if (invite.membersData && invite.membersData.length > 0) {
+        teamMembers.value = invite.membersData
+      }
+      showMergeBanner.value = true
+    } catch {
+      sessionStorage.removeItem('cityfit_pending_invite')
     }
   }
+
+  persistTeamData()
 
   // ── Page tracking setup ──
   pagesContainer.value = document.querySelector('.result-pages') as HTMLElement
