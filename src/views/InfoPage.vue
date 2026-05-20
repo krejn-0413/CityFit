@@ -1,82 +1,77 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-accent-pale via-white to-purple-pale py-8">
-    <div class="max-w-lg mx-auto px-4">
-      <div class="text-center mb-8 animate-slide-up">
-        <h1 class="text-3xl font-display font-bold text-gray-800 mb-2">
-          <span class="inline-flex items-center gap-2">📋 基本信息</span>
-        </h1>
-        <p class="text-sm text-gray-400">先告诉我一些基本信息吧~</p>
+  <div class="min-h-screen bg-canvas-base">
+    <div class="max-w-narrow mx-auto px-6 section-block">
+      <div class="animate-reveal mb-12">
+        <div class="gold-line mb-6"></div>
+        <h1 class="font-display text-section text-text-primary mb-2">基本信息</h1>
+        <p class="text-caption text-text-muted tracking-wider">先告诉我一些基本信息吧</p>
       </div>
 
-      <div class="section-block-yellow animate-scale-in space-y-6">
-        <div>
-          <label class="block text-sm font-bold text-gray-600 mb-2">🎂 出生日期</label>
+      <div class="space-y-10">
+        <div class="animate-reveal stagger-1">
+          <label class="block text-caption text-text-muted tracking-widest mb-4">出生日期</label>
           <div class="grid grid-cols-3 gap-3">
-            <select v-model="year" class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-primary focus:ring-0 text-gray-700 text-sm transition-colors">
+            <select v-model="year" class="text-input w-full">
               <option value="" disabled>年</option>
               <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
             </select>
-            <select v-model="month" class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-secondary focus:ring-0 text-gray-700 text-sm transition-colors">
+            <select v-model="month" class="text-input w-full">
               <option value="" disabled>月</option>
               <option v-for="m in 12" :key="m" :value="m">{{ m }}</option>
             </select>
-            <select v-model="day" class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-accent focus:ring-0 text-gray-700 text-sm transition-colors">
+            <select v-model="day" class="text-input w-full">
               <option value="" disabled>日</option>
               <option v-for="d in daysInMonth" :key="d" :value="d">{{ d }}</option>
             </select>
           </div>
-          <p v-if="dateError" class="text-xs text-primary mt-1.5 ml-1">{{ dateError }}</p>
+          <p v-if="dateError" class="text-caption text-gold mt-3">{{ dateError }}</p>
         </div>
 
-        <div>
-          <label class="block text-sm font-bold text-gray-600 mb-2">🕐 出生时间（选填）</label>
+        <div class="animate-reveal stagger-2">
+          <label class="block text-caption text-text-muted tracking-widest mb-4">出生时间<span class="text-text-faint ml-1">选填</span></label>
           <div class="grid grid-cols-2 gap-3">
-            <select v-model="hour"
-              class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-primary focus:ring-0 text-gray-700 text-sm transition-colors"
-              :class="{ 'text-gray-400': hour === '' }"
-            >
+            <select v-model="hour" class="text-input w-full" :class="{ 'text-text-faint': hour === '' }">
               <option value="" disabled>时</option>
               <option v-for="h in 24" :key="h" :value="h - 1">{{ (h - 1).toString().padStart(2, '0') }} 点</option>
             </select>
-            <select v-model="minute"
-              class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-secondary focus:ring-0 text-gray-700 text-sm transition-colors"
-              :class="{ 'text-gray-400': minute === '' }"
-            >
+            <select v-model="minute" class="text-input w-full" :class="{ 'text-text-faint': minute === '' }">
               <option value="" disabled>分</option>
               <option v-for="m in 60" :key="m" :value="m - 1">{{ (m - 1).toString().padStart(2, '0') }} 分</option>
             </select>
           </div>
-          <label class="inline-flex items-center gap-2 mt-2 cursor-pointer group">
-            <input type="checkbox" v-model="unknownTime" class="w-4 h-4 rounded border-gray-300 text-secondary focus:ring-secondary transition-colors">
-            <span class="text-xs text-gray-400 group-hover:text-gray-500 transition-colors">❓ 不知道出生时间</span>
+          <label class="inline-flex items-center gap-2 mt-4 cursor-pointer group">
+            <input type="checkbox" v-model="unknownTime" class="w-4 h-4 rounded-sm border-border-subtle bg-canvas-card accent-gold">
+            <span class="text-caption text-text-muted group-hover:text-text-body transition-colors">不知道出生时间</span>
           </label>
         </div>
 
-        <div>
-          <label class="block text-sm font-bold text-gray-600 mb-2">👤 性别</label>
+        <div class="animate-reveal stagger-3">
+          <label class="block text-caption text-text-muted tracking-widest mb-4">性别</label>
           <div class="grid grid-cols-2 gap-3">
             <button @click="gender = 'male'"
-              class="py-4 rounded-2xl font-bold text-sm border-2 transition-all duration-300 transform hover:scale-[1.02]"
-              :class="gender === 'male' ? 'bg-accent/10 border-accent text-accent shadow-md' : 'bg-white border-gray-100 text-gray-400 hover:border-accent/30'"
+              class="py-4 text-center border transition-all duration-300 text-body"
+              :class="gender === 'male' ? 'border-gold bg-gold/10 text-gold' : 'border-border-subtle text-text-muted hover:border-border-subtle'"
             >
-              🧑 男生
+              男生
             </button>
             <button @click="gender = 'female'"
-              class="py-4 rounded-2xl font-bold text-sm border-2 transition-all duration-300 transform hover:scale-[1.02]"
-              :class="gender === 'female' ? 'bg-primary/10 border-primary text-primary shadow-md' : 'bg-white border-gray-100 text-gray-400 hover:border-primary/30'"
+              class="py-4 text-center border transition-all duration-300 text-body"
+              :class="gender === 'female' ? 'border-gold bg-gold/10 text-gold' : 'border-border-subtle text-text-muted hover:border-border-subtle'"
             >
-              👩 女生
+              女生
             </button>
           </div>
-          <p v-if="genderError" class="text-xs text-primary mt-1.5 ml-1">{{ genderError }}</p>
         </div>
 
-        <button @click="submitInfo"
-          class="w-full py-4 bg-gradient-to-r from-accent to-secondary text-white text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="!isValid"
-        >
-          🚀 开始测试
-        </button>
+        <div class="animate-reveal stagger-4 pt-4">
+          <button @click="submitInfo"
+            class="btn-primary w-full"
+            :disabled="!isValid"
+            :class="{ 'opacity-30 pointer-events-none': !isValid }"
+          >
+            开始测试
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -109,30 +104,27 @@ const daysInMonth = computed(() => {
 const dateError = computed(() => {
   if (year.value && month.value && day.value) {
     const d = parseInt(day.value)
-    if (d > daysInMonth.value) return `该月只有 ${daysInMonth.value} 天哦~`
+    if (d > daysInMonth.value) return `该月只有 ${daysInMonth.value} 天`
   }
-  return ''
-})
-
-const genderError = computed(() => {
-  if (gender.value) return ''
   return ''
 })
 
 const isValid = computed(() => {
-  return year.value && month.value && day.value && !dateError.value && gender.value
+  return year.value && month.value && day.value && gender.value && !dateError.value
 })
 
 function submitInfo() {
   if (!isValid.value) return
-  const data = {
-    birthDate: { year: parseInt(year.value), month: parseInt(month.value), day: parseInt(day.value) },
-    birthTime: unknownTime.value ? null : { hour: hour.value !== '' ? parseInt(hour.value) : 12, minute: minute.value !== '' ? parseInt(minute.value) : 0 },
+  const m = String(month.value).padStart(2, '0')
+  const d = String(day.value).padStart(2, '0')
+  const h = String(hour.value).padStart(2, '0')
+  const min = String(minute.value).padStart(2, '0')
+  const userInfo = {
+    birthDate: `${year.value}-${m}-${d}`,
+    birthTime: unknownTime.value ? '' : `${h}:${min}`,
     gender: gender.value,
   }
-  const store = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
-  store.userInfo = data
-  sessionStorage.setItem('cityfit', JSON.stringify(store))
+  sessionStorage.setItem('cityfit', JSON.stringify({ userInfo }))
   router.push('/quiz')
 }
 </script>

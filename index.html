@@ -2,14 +2,48 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏙️</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23F0B90B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><rect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%223%22 fill=%22%2316161a%22 stroke=%22%23F0B90B%22/><path d=%22M3 12h18 M12 3v18 M8 8l1.5 4.5L12 8l2.5 4.5L16 8 M12 8v4 M10 18l2-3 2 3%22 fill=%22none%22/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="CityFit 城宜 - 找到你的灵魂城市！18道趣味问答+八字玄学，发现与你最契合的城市。" />
     <meta name="theme-color" content="#FF6B6B" />
-    <title>CityFit 城宜 - 找到你的灵魂城市 🏙️</title>
+    <title>CityFit 城宜 - 找到你的灵魂城市</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      (function() {
+        // ── Debug: ?nobg disables woven background ──
+        if (/[?&]nobg/.test(location.search) || /[?&]nobg/.test(location.hash)) {
+          document.documentElement.classList.add('no-bg');
+        }
+        // ── Ripple ──
+        function triggerRipple(e) {
+          var x, y;
+          if (e.touches) {
+            x = e.touches[0].clientX;
+            y = e.touches[0].clientY;
+          } else {
+            x = e.clientX;
+            y = e.clientY;
+          }
+          var dot = document.createElement('div');
+          dot.className = 'ripple-dot';
+          dot.style.left = x + 'px';
+          dot.style.top = y + 'px';
+          dot.style.width = '16px';
+          dot.style.height = '16px';
+          document.body.appendChild(dot);
+          dot.addEventListener('animationend', function() {
+            dot.remove();
+          });
+        }
+        document.addEventListener('click', triggerRipple, { passive: true });
+        document.addEventListener('touchstart', triggerRipple, { passive: true });
+      })();
+    </script>
   </body>
 </html>

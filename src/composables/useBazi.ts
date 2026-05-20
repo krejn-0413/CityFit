@@ -29,6 +29,7 @@ const DAY_MASTER_PERSONALITY: Record<string, string> = {
 }
 
 const WUXING_EMOJI: Record<string, string> = { '木': '🌳', '火': '🔥', '土': '⛰️', '金': '⚔️', '水': '💧' }
+const WUXING_ICONS: Record<string, string> = { '木': 'wuxing-mu', '火': 'wuxing-huo', '土': 'wuxing-tu', '金': 'wuxing-jin', '水': 'wuxing-shui' }
 
 function getYearGanZhi(year: number): [string, string] {
   const offset = year - 4
@@ -255,4 +256,4 @@ export function getEnhancedBaziInfo(bazi: BaziInfo): EnhancedBaziInfo {
   }
 }
 
-export { WUXING_COLORS, WUXING_EMOJI }
+export { WUXING_COLORS, WUXING_EMOJI, WUXING_ICONS }

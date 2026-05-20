@@ -24,31 +24,31 @@ function initChart() {
   const option = {
     radar: {
       indicator: [
-        { name: '物欲都市 🏙️', max: 100, color: '#FF6B6B' },
-        { name: '精神桃源 🌿', max: 100, color: '#4ECDC4' },
-        { name: '玄学缘分 🔮', max: 100, color: '#45B7D1' },
+        { name: '物欲都市', max: 100, color: '#F0B90B' },
+        { name: '精神桃源', max: 100, color: '#F0B90B' },
+        { name: '玄学缘分', max: 100, color: '#F0B90B' },
       ],
       shape: 'circle',
       center: ['50%', '50%'],
       radius: '65%',
       axisName: {
-        color: '#666',
+        color: '#7A756E',
         fontSize: 13,
         fontWeight: 'bold',
       },
       splitArea: {
         areaStyle: {
-          color: ['rgba(78, 205, 196, 0.02)', 'rgba(78, 205, 196, 0.05)', 'rgba(78, 205, 196, 0.08)'],
+          color: ['rgba(240,185,11,0.02)', 'rgba(240,185,11,0.04)', 'rgba(240,185,11,0.06)'],
         },
       },
       axisLine: {
         lineStyle: {
-          color: 'rgba(78, 205, 196, 0.3)',
+          color: 'rgba(240,185,11,0.15)',
         },
       },
       splitLine: {
         lineStyle: {
-          color: 'rgba(78, 205, 196, 0.2)',
+          color: 'rgba(240,185,11,0.1)',
         },
       },
     },
@@ -60,14 +60,14 @@ function initChart() {
             value: [props.material, props.spiritual, props.xuanxue],
             name: '你的城市画像',
             areaStyle: {
-              color: 'rgba(255, 107, 107, 0.25)',
+              color: 'rgba(240,185,11,0.2)',
             },
             lineStyle: {
-              color: '#FF6B6B',
+              color: '#F0B90B',
               width: 2,
             },
             itemStyle: {
-              color: '#FF6B6B',
+              color: '#F0B90B',
             },
           },
         ],

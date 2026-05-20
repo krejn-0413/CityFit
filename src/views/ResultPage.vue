@@ -1,532 +1,539 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-cyan-50">
-    <!-- 预览模式：无测试结果，来自好友分享链接 -->
-    <template v-if="previewMode">
-      <div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
-
-        <div class="animate-slide-up bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-6 border border-purple-200 shadow-sm text-center">
-          <span class="text-4xl">👋</span>
-          <p class="text-lg font-bold text-gray-700 mt-3">
-            {{ sharedFromFriend?.private ? '一位匿名好友' : sharedFromFriend?.name }}
-          </p>
-          <p class="text-sm text-gray-500 mt-1">
-            分享了TA的城市测评，来看看TA的本命城市！
-          </p>
-        </div>
-
-        <h3 class="text-xl font-display font-bold text-gray-700 flex items-center gap-2">
-          <span class="w-1.5 h-6 bg-gradient-to-b from-primary to-secondary rounded-full inline-block"></span>
-          🏆 {{ sharedFromFriend?.private ? 'TA' : sharedFromFriend?.name }}的 Top 3 城市
-        </h3>
-
-        <div v-for="(r, idx) in previewFriendCities" :key="r.cityId"
-          class="glass-card-strong p-5"
-        >
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shrink-0"
-              :class="idx === 0 ? 'bg-gradient-to-br from-primary to-primary-light' : idx === 1 ? 'bg-gradient-to-br from-secondary to-secondary-light' : 'bg-gradient-to-br from-accent to-accent-light'"
+  <div class="result-pages">
+    <!-- ===== Page 1: 城市人格 ===== -->
+    <section class="result-page" data-page="0">
+      <div class="page-inner">
+        <!-- Preview mode: visitor without test results -->
+        <template v-if="previewMode">
+          <div class="card border-gold/20 animate-reveal text-center">
+            <IconSprite name="wave-hand" size="32" />
+            <p class="text-body text-text-primary font-bold mt-3">
+              {{ sharedFromFriend?.private ? '一位匿名好友' : sharedFromFriend?.name }}
+            </p>
+            <p class="text-caption text-text-muted mt-1">分享了TA的城市测评，来看看TA的本命城市！</p>
+          </div>
+          <div class="flex justify-center gap-3 mt-6 animate-reveal stagger-1">
+            <button @click="goTakeTest" class="btn-primary text-caption">
+              我也测一测
+            </button>
+            <button @click="previewMode = false" class="btn-secondary text-caption px-4">
+              仅看效果
+            </button>
+          </div>
+          <!-- Friend's top cities preview -->
+          <div class="mt-8">
+            <h3 class="font-display text-section text-text-primary mb-4 text-center">
+              🏆 {{ sharedFromFriend?.private ? 'TA' : sharedFromFriend?.name }} 的 Top 城市
+            </h3>
+            <div v-for="(r, idx) in (sharedFromFriend?.results || [])" :key="r.cityId"
+              class="card-hover mb-3 animate-reveal"
+              :class="'stagger-' + (idx + 2)"
             >
-              {{ idx + 1 }}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-lg font-bold text-gray-800">{{ r.cityName }}</span>
-                <span class="text-xs text-gray-400">匹配度 {{ r.matchPercentage }}%</span>
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 flex items-center justify-center text-lg font-bold shrink-0"
+                  :class="idx === 0 ? 'bg-gold text-canvas-base' : 'bg-canvas-overlay border border-border-subtle text-text-muted'"
+                >{{ idx + 1 }}</div>
+                <div class="flex-1">
+                  <span class="text-body text-text-primary font-bold">{{ r.cityName }}</span>
+                </div>
+                <span class="text-section text-gold">{{ r.matchPercentage }}%</span>
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="section-block-accent">
-          <ChinaMap
-            :top-cities="previewMapCities"
-            :team-id="teamId"
-            :show-team-label="true"
-          />
-        </div>
-
-        <div class="text-center animate-fade-in">
-          <button @click="goTakeTest"
-            class="px-10 py-5 bg-gradient-to-r from-primary to-secondary text-white text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-          >
-            🧪 我也要测测我的本命城市
-          </button>
-          <p class="text-xs text-gray-400 mt-3">完成测试后，可以选择加入TA的小队一起点亮地图！</p>
-        </div>
-
-        <div class="text-center text-xs text-gray-300 py-4">
-          © 2026 CityFit · 仅供娱乐 · 开心就好 😊
-        </div>
-      </div>
-    </template>
-
-    <!-- 正常模式：有测试结果 -->
-    <template v-else>
-      <div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
-
-        <div v-if="sharedFromFriend" class="animate-slide-up bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-5 border border-purple-200 shadow-sm">
-          <div class="flex items-center gap-3">
-            <span class="text-3xl">👋</span>
-            <div>
-              <p class="text-sm font-bold text-gray-700">
-                {{ sharedFromFriend.private ? '一位匿名好友' : sharedFromFriend.name }} 分享了TA的城市测评
-              </p>
-              <p class="text-xs text-gray-500">以下地图中彩色气泡为好友的推荐城市，你也可以测测自己的！</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center animate-slide-up">
-        <div class="text-6xl mb-4">🎉</div>
-        <h1 class="text-3xl md:text-4xl font-display font-bold text-gray-800 mb-2">
-          你的城市人格是...
-        </h1>
-      </div>
-
-      <div class="section-block-primary text-center animate-scale-in">
-        <div class="text-5xl mb-4">{{ personalityEmoji }}</div>
-        <h2 class="text-2xl md:text-3xl font-display font-bold bg-gradient-to-r from-primary via-primary-light to-accent gradient-text">
-          {{ personalityTag }}
-        </h2>
-      </div>
-
-      <div class="section-block-secondary animate-slide-up" style="animation-delay: 0.15s">
-        <h3 class="text-lg font-display font-bold text-gray-700 mb-4 text-center">
-          <span class="inline-flex items-center gap-2">🎨 AI 城市人格画像</span>
-        </h3>
-        <div v-if="personalityProfile" class="flex flex-col items-center">
-          <div class="w-48 h-48 mb-4 rounded-2xl overflow-hidden shadow-lg border-2 border-white/60"
-            :style="{ boxShadow: '0 0 30px ' + personalityProfile.color + '30' }"
-          >
-            <CityPersonaImage
-              :asset-src="personalityAssetSrc"
-              :city-name="topResults[0]?.city.name || ''"
-              :color="personalityProfile.color"
-              :tag="personalityProfile.tag"
-              :emoji="personalityProfile.emoji || ''"
+          <!-- Preview map -->
+          <div class="h-[300px] w-full border border-border-subtle overflow-hidden mt-6 animate-reveal stagger-5">
+            <ChinaMap
+              :top-cities="[]"
+              :merged-points="(sharedFromFriend?.results || []).map(r => ({ name: r.cityName, value: r.matchPercentage }))"
+              :team-id="teamId"
+              :show-team-label="false"
+              @city-click="showCityDetail"
             />
           </div>
-          <div class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-2xl shadow-sm border border-gray-100 mb-2">
-            <span class="text-lg font-bold text-gray-700">{{ personalityProfile.tag }}</span>
-            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">城市人格</span>
-          </div>
-          <p class="text-sm text-gray-500 text-center max-w-md">{{ personalityProfile.description }}</p>
-          <div class="mt-3 text-xs text-gray-400 text-center">
-            你的性格气质与{{ topResults[0]?.city.name }}完美共振
-          </div>
-        </div>
-      </div>
+          <footer class="py-10 text-center">
+            <p class="text-fine text-text-faint tracking-widest">娱乐测评 · 仅供开心</p>
+          </footer>
+        </template>
 
-      <div class="space-y-4 animate-slide-up" style="animation-delay: 0.2s">
-        <h3 class="text-xl font-display font-bold text-gray-700 flex items-center gap-2">
-          <span class="w-1.5 h-6 bg-gradient-to-b from-primary to-secondary rounded-full inline-block"></span>
-          🏆 你的 Top 3 城市
-        </h3>
-        <div v-for="(r, idx) in topResults" :key="r.city.id"
-          class="glass-card-strong p-5 transform hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
-          :style="{ animationDelay: (0.3 + idx * 0.15) + 's' }"
-          @click="showCityDetail(r.city)"
-        >
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shrink-0 transform group-hover:scale-110 transition-transform"
-              :class="idx === 0 ? 'bg-gradient-to-br from-primary to-primary-light' : idx === 1 ? 'bg-gradient-to-br from-secondary to-secondary-light' : 'bg-gradient-to-br from-accent to-accent-light'"
-            >
-              {{ idx + 1 }}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-lg font-bold text-gray-800">{{ r.city.name }}</span>
-                <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ r.city.province }}</span>
-              </div>
-              <div class="flex flex-wrap gap-1.5 mt-2">
-                <span v-for="tag in r.city.tags" :key="tag"
-                  class="px-2.5 py-0.5 bg-gray-100 rounded-full text-xs text-gray-500"
-                >
-                  #{{ tag }}
-                </span>
-              </div>
-            </div>
-            <div class="text-right shrink-0">
-              <div class="text-2xl font-bold"
-                :class="idx === 0 ? 'text-primary' : idx === 1 ? 'text-secondary' : 'text-accent'"
-              >
-                {{ r.matchPercentage }}%
-              </div>
-              <div class="text-xs text-gray-400">匹配度</div>
-            </div>
-          </div>
-          <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-sm text-gray-500 leading-relaxed">{{ r.reason }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-block-accent animate-slide-up" style="animation-delay: 0.4s">
-        <h3 class="text-lg font-display font-bold text-gray-700 mb-1 text-center">
-          <span class="inline-flex items-center gap-2">🗺️ 点亮中国地图</span>
-        </h3>
-        <p class="text-xs text-gray-400 text-center mb-4">
-          你和好友的 Top 城市将在这里点亮！分享链接互相看到对方的地图
-        </p>
-
-        <div class="flex items-stretch justify-center gap-3 mb-4">
-          <div v-for="(r, idx) in topResults" :key="r.city.id"
-            class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 bg-white/70 rounded-2xl px-2.5 py-3 shadow-sm border relative overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
-            :class="idx === 0 ? 'border-primary/40' : idx === 1 ? 'border-secondary/40' : 'border-accent/40'"
-            @click="showCityDetail(r.city)"
-          >
-            <div class="absolute top-0 left-0 right-0 h-1"
-              :class="idx === 0 ? 'bg-primary' : idx === 1 ? 'bg-secondary' : 'bg-accent'"
-            ></div>
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md"
-              :class="idx === 0 ? 'bg-primary' : idx === 1 ? 'bg-secondary' : 'bg-accent'"
-            >
-              {{ idx === 0 ? '🏆' : idx === 1 ? '🥈' : '🥉' }}
-            </div>
-            <span class="text-sm font-bold text-gray-700">{{ r.city.name }}</span>
-            <span class="text-xs font-bold"
-              :class="idx === 0 ? 'text-primary' : idx === 1 ? 'text-secondary' : 'text-accent'"
-            >{{ r.matchPercentage }}%</span>
-            <div class="w-full bg-gray-100 rounded-full h-1.5 mt-0.5 overflow-hidden">
-              <div class="h-full rounded-full transition-all duration-1000"
-                :class="idx === 0 ? 'bg-primary' : idx === 1 ? 'bg-secondary' : 'bg-accent'"
-                :style="{ width: r.matchPercentage + '%' }"
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full">
-          <ChinaMap
-            :top-cities="mapTopCities"
-            :merged-points="mapMergedPoints"
-            :team-id="teamId"
-            :show-team-label="true"
-            @city-click="showCityDetail"
-          />
-        </div>
-
-        <div v-if="showMergeBanner" class="animate-fade-in bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200 shadow-sm">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="text-2xl">🗺️</span>
+        <!-- Merge banner (after quiz, with pending invite) -->
+        <div v-if="showMergeBanner" class="card border-gold/20 animate-reveal mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <IconSprite name="map" size="24" />
             <div>
-              <p class="text-sm font-bold text-gray-700">已展示「{{ pendingTeamName }}」的推荐城市</p>
-              <p class="text-xs text-gray-500">想正式加入TA的小队，让地图持续合并展示吗？</p>
+              <p class="text-caption text-text-primary font-bold">已展示「{{ pendingTeamName }}」的推荐城市</p>
+              <p class="text-fine text-text-muted mt-1">想正式加入TA的小队，让地图持续合并展示吗？</p>
             </div>
           </div>
           <div class="flex gap-2">
-            <button @click="acceptJoinTeam"
-              class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-xl hover:shadow-md transition-all"
-            >
-              ✅ 加入小队
+            <button @click="acceptJoinTeam" class="btn-primary flex-1 text-caption">
+              加入小队
             </button>
-            <button @click="declineJoinTeam"
-              class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all"
-            >
-              👀 仅看效果
+            <button @click="declineJoinTeam" class="btn-secondary text-caption px-4">
+              仅看效果
             </button>
           </div>
         </div>
 
-        <div class="mt-4 space-y-3">
-          <div class="bg-white/60 rounded-2xl p-4 border border-white">
-            <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">👥 分享结果 · 邀请好友一起点亮地图</h4>
-
-            <div class="flex items-center justify-center gap-2 mb-4">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
-                🏳️ 小队 <span class="font-bold text-gray-800">{{ teamId }}</span>
-              </span>
-              <span class="text-xs text-gray-400">· {{ teamMembers.length + 1 }} 人</span>
+        <!-- Normal mode (has results, not preview) -->
+        <template v-if="!previewMode">
+        <div v-if="sharedFromFriend" class="card border-gold/20 animate-reveal">
+          <div class="flex items-center gap-3">
+            <IconSprite name="wave-hand" size="24" />
+            <div>
+              <p class="text-caption text-text-primary font-bold">
+                {{ sharedFromFriend.private ? '一位匿名好友' : sharedFromFriend.name }} 分享了TA的城市测评
+              </p>
+              <p class="text-fine text-text-muted mt-1">以下地图中彩色气泡为好友的推荐城市，你也可以测测自己的！</p>
             </div>
+          </div>
+        </div>
 
-            <div class="flex gap-2 mb-4">
-              <button @click="copyTeamLink"
-                class="flex-1 py-2.5 rounded-2xl text-sm font-bold shadow-sm hover:shadow-md transition-all"
-                :class="copyStatus === 'copied' ? 'bg-green-500 text-white' : copyStatus === 'error' ? 'bg-red-400 text-white' : 'bg-gradient-to-r from-secondary to-accent text-white'"
-              >
-                {{ copyStatus === 'copied' ? '✅ 链接已复制！' : copyStatus === 'error' ? '❌ 复制失败' : '🔗 分享我的结果' }}
-              </button>
-              <button @click="showJoinInput = !showJoinInput"
-                class="px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-600 text-sm font-bold rounded-2xl hover:border-secondary hover:text-secondary transition-all"
-              >
-                ➕ 加入小队
-              </button>
+        <div class="text-center">
+          <div class="gold-line-center mb-8 animate-reveal"></div>
+          <h1 class="font-display text-hero text-text-primary mb-3 animate-reveal stagger-1">你的城市人格是...</h1>
+        </div>
+
+        <div class="text-center">
+          <div class="animate-reveal stagger-2">
+            <h2 class="font-display text-section text-gold mb-4">{{ personalityTag }}</h2>
+            <div class="gold-line-center mb-6"></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-display text-section text-text-primary mb-10 text-center animate-reveal">AI 城市人格画像</h3>
+
+          <div v-if="personalityProfile" class="flex flex-col items-center animate-reveal stagger-1">
+            <div class="w-48 h-48 mb-6 overflow-hidden border border-border-subtle"
+              :style="{ boxShadow: '0 0 40px ' + personalityProfile.color + '15' }"
+            >
+              <CityPersonaImage
+                :asset-src="personalityAssetSrc"
+                :city-name="topResults[0]?.city.name || ''"
+                :color="personalityProfile.color"
+                :tag="personalityProfile.tag"
+                :emoji="personalityProfile.icon || personalityProfile.emoji"
+              />
             </div>
+            <div class="inline-flex items-center gap-2 px-5 py-2 card mb-4">
+              <span class="text-body text-text-primary font-bold">{{ personalityProfile.tag }}</span>
+              <span class="tag-active">城市人格</span>
+            </div>
+            <p class="text-body text-text-body text-center max-w-md leading-relaxed">{{ personalityProfile.description }}</p>
+            <p class="mt-4 text-caption text-text-muted text-center">
+              你的性格气质与{{ topResults[0]?.city.name }}完美共振
+            </p>
+          </div>
+        </div>
+      </template>
+      </div>
+    </section>
 
-            <div v-if="showJoinInput" class="mb-4 p-3 bg-gray-50 rounded-2xl">
-              <p class="text-xs text-gray-500 mb-2">输入对方的小队码，加入后你们的地图会合并显示：</p>
-              <div class="flex gap-2">
-                <input v-model="joinTeamCode" type="text" placeholder="输入小队码"
-                  class="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-secondary transition-all text-center"
-                  maxlength="6"
-                />
-                <button @click="joinTeam"
-                  class="px-5 py-2 bg-secondary text-white text-sm font-bold rounded-xl hover:shadow-md transition-all"
+    <!-- ===== Page 2: 八字玄学 ===== -->
+    <section class="result-page" data-page="1">
+      <div class="page-inner">
+        <div v-if="enhancedBazi">
+          <h3 class="font-display text-section text-text-primary mb-10 text-center animate-reveal">八字玄学 · 日主与城市深度分析</h3>
+
+          <div class="card mb-5 animate-reveal stagger-1">
+            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">四柱八字</h4>
+            <div class="flex justify-center gap-3 mb-5">
+              <div v-for="(stem, i) in enhancedBazi.heavenlyStems" :key="i" class="flex flex-col items-center">
+                <div class="text-fine text-text-muted mb-1">{{ ['年', '月', '日', '时'][i] }}柱</div>
+                <div class="w-14 h-14 flex items-center justify-center text-xl font-bold shadow-md"
+                  :style="{ backgroundColor: getWuxingColor(enhancedBazi.fiveElements[i]) + '15', color: getWuxingColor(enhancedBazi.fiveElements[i]), border: '1px solid ' + getWuxingColor(enhancedBazi.fiveElements[i]) + '30' }"
                 >
-                  加入
-                </button>
+                  {{ stem }}
+                </div>
+                <div class="w-14 h-10 flex items-center justify-center text-base font-bold text-text-muted bg-canvas-overlay mt-1 border border-border-subtle">
+                  {{ enhancedBazi.earthlyBranches[i] }}
+                </div>
+                <div class="text-fine mt-1 font-medium" :style="{ color: getWuxingColor(enhancedBazi.fiveElements[i]) }">
+                  {{ enhancedBazi.fiveElements[i] }}<IconSprite :name="getWuxingIcon(enhancedBazi.fiveElements[i])" size="14" />
+                </div>
+              </div>
+            </div>
+            <div class="space-y-2 text-body text-text-body">
+              <p v-for="(interp, i) in enhancedBazi.pillarInterpretations" :key="i">{{ interp }}</p>
+            </div>
+          </div>
+
+          <div class="card mb-5 animate-reveal stagger-2">
+            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">五行分布</h4>
+            <div class="space-y-3">
+              <div v-for="(count, elem) in enhancedBazi.elementDistribution" :key="elem" class="flex items-center gap-3">
+                <span class="w-6 text-center text-sm"><IconSprite :name="getWuxingIcon(elem)" size="14" /></span>
+                <span class="w-6 text-caption font-medium" :style="{ color: getWuxingColor(elem) }">{{ elem }}</span>
+                <div class="score-bar flex-1">
+                  <div class="score-bar-fill" :style="{ width: (count / 4 * 100) + '%', backgroundColor: getWuxingColor(elem) }"></div>
+                </div>
+                <span class="w-5 text-right text-fine text-text-muted">{{ count }}</span>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-center gap-2 text-caption text-text-muted">
+              <span>五行均衡度</span>
+              <div class="score-bar w-24">
+                <div class="score-bar-fill bg-gold" :style="{ width: enhancedBazi.wuxingBalanceScore + '%' }"></div>
+              </div>
+              <span class="font-medium text-gold">{{ enhancedBazi.wuxingBalanceScore }}%</span>
+            </div>
+          </div>
+
+          <div class="card mb-5 animate-reveal stagger-3">
+            <h4 class="text-caption text-text-primary font-bold mb-4 text-center tracking-wider">
+              日主分析 · {{ enhancedBazi.dayMaster }}<IconSprite :name="getWuxingIcon(enhancedBazi.dayMaster)" size="14" />
+              <span class="text-fine text-text-muted font-normal">（与城市选择的关系）</span>
+            </h4>
+            <p class="text-body text-text-body leading-relaxed mb-5">{{ enhancedBazi.dayMasterPersonality }}</p>
+            <div class="bg-gold/5 p-4 border border-gold/10">
+              <p class="text-body text-text-body leading-relaxed">{{ dayMasterCityAnalysis }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-5 animate-reveal stagger-4">
+            <div class="card border-gold/10">
+              <div class="text-caption text-text-muted mb-2">喜用神</div>
+              <div class="flex gap-1.5 flex-wrap">
+                <span v-for="l in enhancedBazi.likes" :key="l"
+                  class="tag-active text-fine"
+                >{{ l }}<IconSprite :name="getWuxingIcon(l)" size="14" /></span>
+              </div>
+              <div class="text-fine text-text-muted mt-3">你的 Top 1 城市「{{ topResults[0]?.city.name }}」{{ cityWuxingMatchText }}</div>
+            </div>
+            <div class="card">
+              <div class="text-caption text-text-muted mb-2">忌神</div>
+              <div class="flex gap-1.5 flex-wrap">
+                <span v-for="d in enhancedBazi.dislikes" :key="d"
+                  class="tag text-fine"
+                  :style="{ borderColor: getWuxingColor(d) + '40', color: getWuxingColor(d) }"
+                >{{ d }}<IconSprite :name="getWuxingIcon(d)" size="14" /></span>
+              </div>
+              <div class="text-fine text-text-muted mt-3">需谨慎选择忌神元素过旺的城市</div>
+            </div>
+          </div>
+
+          <div class="card mb-5 animate-reveal stagger-5">
+            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">五行生克制化 · 与城市选择的关系</h4>
+            <div v-if="enhancedBazi.wuxingRelation.shengCycles.length > 0 || enhancedBazi.wuxingRelation.keCycles.length > 0">
+              <div class="flex flex-wrap gap-2 justify-center mb-5">
+                <span v-for="s in enhancedBazi.wuxingRelation.shengCycles" :key="s" class="tag-active text-fine">{{ s }}</span>
+                <span v-for="k in enhancedBazi.wuxingRelation.keCycles" :key="k" class="tag text-fine">{{ k }}</span>
+              </div>
+              <p class="text-body text-text-body text-center mb-5">{{ enhancedBazi.wuxingRelation.summary }}</p>
+            </div>
+            <div class="bg-gold/5 p-4 border border-gold/10">
+              <p class="text-body text-text-body leading-relaxed">{{ wuxingCityAnalysis }}</p>
+            </div>
+          </div>
+
+          <div class="card animate-reveal stagger-6">
+            <h4 class="text-caption text-text-primary font-bold mb-4 text-center tracking-wider">
+              夫妻宫 · {{ enhancedBazi.earthlyBranches[2] }}
+              <span class="text-fine text-text-muted font-normal">（对城市选择的影响）</span>
+            </h4>
+            <p class="text-body text-text-body mb-4">{{ enhancedBazi.detailedCouplePalace.summary }}</p>
+            <p class="text-body text-text-body leading-relaxed mb-5">{{ enhancedBazi.detailedCouplePalace.detailed }}</p>
+            <div class="bg-gold/5 p-4 border border-gold/10">
+              <p class="text-body text-text-body leading-relaxed">{{ couplePalaceCityAnalysis }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Page 3: 三维城市画像 ===== -->
+    <section class="result-page" data-page="2">
+      <div class="page-inner">
+        <div>
+          <h3 class="font-display text-section text-text-primary mb-10 text-center animate-reveal">三维城市画像 · 专业解读</h3>
+          <div class="h-72 mb-8 animate-reveal stagger-1">
+            <RadarChart :material="radarScores.material" :spiritual="radarScores.spiritual" :xuanxue="radarScores.xuanxue" />
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 mb-8 text-center animate-reveal stagger-2">
+            <div class="card border-gold/10">
+              <div class="text-section text-gold">{{ radarScores.material }}%</div>
+              <div class="text-caption text-text-muted">物欲都市</div>
+            </div>
+            <div class="card border-gold/10">
+              <div class="text-section text-gold">{{ radarScores.spiritual }}%</div>
+              <div class="text-caption text-text-muted">精神桃源</div>
+            </div>
+            <div class="card border-gold/10">
+              <div class="text-section text-gold">{{ radarScores.xuanxue }}%</div>
+              <div class="text-caption text-text-muted">玄学缘分</div>
+            </div>
+          </div>
+
+          <div class="space-y-4 animate-reveal stagger-3">
+            <div class="card">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-8 h-8 bg-gold/10 flex items-center justify-center text-gold text-sm">物</span>
+                <span class="text-caption text-text-primary font-bold">物质维度</span>
+                <span class="ml-auto text-caption text-gold font-bold">{{ radarScores.material }}%</span>
+              </div>
+              <p class="text-body text-text-body leading-relaxed">{{ materialInterpretation }}</p>
+            </div>
+            <div class="card">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-8 h-8 bg-gold/10 flex items-center justify-center text-gold text-sm">精</span>
+                <span class="text-caption text-text-primary font-bold">精神维度</span>
+                <span class="ml-auto text-caption text-gold font-bold">{{ radarScores.spiritual }}%</span>
+              </div>
+              <p class="text-body text-text-body leading-relaxed">{{ spiritualInterpretation }}</p>
+            </div>
+            <div class="card">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-8 h-8 bg-gold/10 flex items-center justify-center text-gold text-sm">玄</span>
+                <span class="text-caption text-text-primary font-bold">玄学维度</span>
+                <span class="ml-auto text-caption text-gold font-bold">{{ radarScores.xuanxue }}%</span>
+              </div>
+              <p class="text-body text-text-body leading-relaxed">{{ xuanxueInterpretation }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Page 4: 组队 + Top3 ===== -->
+    <section class="result-page" data-page="3">
+      <div class="page-inner">
+        <div>
+          <h3 class="font-display text-section text-text-primary mb-2 text-center animate-reveal">点亮中国地图</h3>
+          <p class="text-caption text-text-muted text-center mb-8 animate-reveal stagger-1">
+            你和好友的 Top 城市将在这里点亮！分享链接互相看到对方的地图
+          </p>
+
+          <div class="flex items-stretch justify-center gap-3 mb-8 animate-reveal stagger-2">
+            <div v-for="(r, idx) in topResults" :key="r.city.id"
+              class="flex-1 max-w-[110px] flex flex-col items-center gap-1.5 card py-3 relative overflow-hidden"
+              :class="idx === 0 ? 'border-gold/30' : ''"
+            >
+              <div class="absolute top-0 left-0 right-0 h-0.5 bg-gold" v-if="idx === 0"></div>
+              <div class="w-8 h-8 flex items-center justify-center text-xs font-bold"
+                :class="idx === 0 ? 'bg-gold text-canvas-base' : 'bg-canvas-overlay text-text-muted'"
+              >
+                <IconSprite :name="idx === 0 ? 'trophy-gold' : idx === 1 ? 'medal-silver' : 'medal-bronze'" size="16" />
+              </div>
+              <IconSprite :name="r.city.icon" size="18" />
+              <span class="text-caption text-text-primary font-bold">{{ r.city.name }}</span>
+              <span class="text-caption font-bold" :class="idx === 0 ? 'text-gold' : 'text-text-muted'">{{ r.matchPercentage }}%</span>
+              <div class="score-bar w-full mt-0.5">
+                <div class="score-bar-fill bg-gold" :style="{ width: r.matchPercentage + '%' }"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-[420px] w-full border border-border-subtle overflow-hidden animate-reveal stagger-3">
+            <ChinaMap
+              :top-cities="mapTopCities"
+              :merged-points="mapMergedPoints"
+              :overlap-cities="mapOverlapCities"
+              :team-id="teamId"
+              :show-team-label="true"
+              @city-click="showCityDetail"
+            />
+          </div>
+
+          <div class="mt-8 card animate-reveal stagger-4">
+            <h4 class="text-caption text-text-primary font-bold mb-5 text-center tracking-wider">小队系统 · 组队点亮地图</h4>
+
+            <div class="flex items-center justify-center gap-2 mb-5">
+              <span class="tag-active">小队 {{ teamId }}</span>
+              <span class="text-caption text-text-muted">&middot; {{ (sharedFromFriend ? 1 : 0) + teamMembers.length + 1 }} 人</span>
+            </div>
+
+            <!-- Team member list -->
+            <div v-if="sharedFromFriend || teamMembers.length > 0" class="mb-5 space-y-2">
+              <div class="text-caption text-text-muted mb-2 text-center">队员城市一览</div>
+              <!-- Current user -->
+              <div class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-gold/30">
+                <span class="w-2 h-2 rounded-full bg-gold shrink-0"></span>
+                <span class="text-caption text-text-primary font-bold">我</span>
+                <span class="text-fine text-text-muted ml-auto">
+                  <span v-for="(r, i) in topResults.slice(0,2)" :key="i">{{ r.city.name }}{{ i < Math.min(topResults.length,2)-1 ? '、' : '' }}</span>
+                </span>
+              </div>
+              <!-- Shared friend -->
+              <div v-if="sharedFromFriend" class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-border-subtle">
+                <span class="w-2 h-2 rounded-full bg-gold/50 shrink-0"></span>
+                <span class="text-caption text-text-primary font-bold">{{ sharedFromFriend.private ? '匿名' : sharedFromFriend.name }}</span>
+                <span class="text-fine text-text-muted ml-auto">
+                  <span v-for="(r, i) in sharedFromFriend.results.slice(0,2)" :key="i">{{ r.cityName }}{{ i < Math.min(sharedFromFriend.results.length,2)-1 ? '、' : '' }}</span>
+                </span>
+              </div>
+              <!-- Other team members -->
+              <div v-for="m in teamMembers" :key="m.name" class="flex items-center gap-2 bg-canvas-overlay px-3 py-2 border border-border-subtle">
+                <span class="w-2 h-2 rounded-full bg-gold/30 shrink-0"></span>
+                <span class="text-caption text-text-primary font-bold">{{ m.name }}</span>
+                <span class="text-fine text-text-muted ml-auto">
+                  <span v-for="(r, i) in m.results.slice(0,2)" :key="i">{{ r.cityName }}{{ i < Math.min(m.results.length,2)-1 ? '、' : '' }}</span>
+                </span>
               </div>
             </div>
 
-            <div class="flex items-center justify-center gap-2 mb-3 pt-3 border-t border-gray-200/60">
-              <span class="text-sm text-gray-500">匿名</span>
-              <button @click="privateMode = !privateMode"
-                class="relative w-12 h-6 rounded-full transition-colors duration-300"
-                :class="privateMode ? 'bg-gray-300' : 'bg-secondary'"
+            <div class="flex gap-2 mb-5">
+              <button @click="copyTeamLink"
+                class="btn-primary flex-1 text-caption"
+                :class="{ 'bg-green-500': copyStatus === 'copied', 'bg-red-400': copyStatus === 'error' }"
               >
-                <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300"
+                {{ copyStatus === 'copied' ? '已复制到剪贴板！' : copyStatus === 'error' ? '复制失败' : '复制小队链接' }}
+              </button>
+              <button @click="showJoinInput = !showJoinInput" class="btn-secondary text-caption px-4">
+                加入小队
+              </button>
+            </div>
+
+            <div v-if="showJoinInput" class="mb-5 p-4 bg-canvas-overlay">
+              <p class="text-caption text-text-muted mb-3">粘贴好友的分享链接或输入小队码，加入后你们的地图会合并显示：</p>
+              <div class="flex gap-2">
+                <input v-model="joinTeamCode" type="text" placeholder="粘贴分享链接或输入小队码"
+                  class="text-input flex-1 text-center"
+                />
+                <button @click="joinTeam" class="btn-primary text-caption">加入</button>
+              </div>
+            </div>
+
+            <div class="divider mb-5"></div>
+
+            <div class="flex items-center justify-center gap-2 mb-4">
+              <span class="text-caption text-text-muted">匿名</span>
+              <button @click="privateMode = !privateMode"
+                class="relative w-12 h-6 rounded-pill transition-colors duration-300"
+                :class="privateMode ? 'bg-canvas-overlay border border-border-subtle' : 'bg-gold'"
+              >
+                <span class="absolute top-0.5 w-5 h-5 bg-gold rounded-full shadow-md transition-transform duration-300"
                   :class="privateMode ? 'translate-x-0' : 'translate-x-6'"
                 ></span>
               </button>
-              <span class="text-sm text-gray-500">昵称</span>
+              <span class="text-caption text-text-muted">昵称</span>
             </div>
-            <div v-if="!privateMode" class="mb-3">
+            <div v-if="!privateMode">
               <input v-model="shareName" type="text" placeholder="输入你的昵称（可选）"
-                class="w-full px-4 py-2.5 rounded-2xl border border-gray-200 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all text-center"
-                maxlength="10"
+                class="text-input w-full text-center" maxlength="10"
               />
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="section-block-yellow animate-slide-up" style="animation-delay: 0.5s">
-        <h3 class="text-lg font-display font-bold text-gray-700 mb-4 text-center">
-          <span class="inline-flex items-center gap-2">📊 三维城市画像 · 专业解读</span>
-        </h3>
-        <div class="h-72">
-          <RadarChart :material="radarScores.material" :spiritual="radarScores.spiritual" :xuanxue="radarScores.xuanxue" />
-        </div>
-
-        <div class="grid grid-cols-3 gap-3 mt-4 text-center text-sm">
-          <div class="bg-primary/10 rounded-2xl p-3 border border-primary/20">
-            <div class="text-primary font-bold text-lg">{{ radarScores.material }}%</div>
-            <div class="text-gray-500">物欲都市 🏙️</div>
+        <div>
+          <div class="flex items-center gap-3 justify-center mb-10 animate-reveal">
+            <div class="gold-line"></div>
+            <h3 class="font-display text-section text-text-primary">你的 Top 3 城市</h3>
+            <div class="gold-line" style="transform: scaleX(-1)"></div>
           </div>
-          <div class="bg-secondary/10 rounded-2xl p-3 border border-secondary/20">
-            <div class="text-secondary font-bold text-lg">{{ radarScores.spiritual }}%</div>
-            <div class="text-gray-500">精神桃源 🌿</div>
-          </div>
-          <div class="bg-accent/10 rounded-2xl p-3 border border-accent/20">
-            <div class="text-accent font-bold text-lg">{{ radarScores.xuanxue }}%</div>
-            <div class="text-gray-500">玄学缘分 🔮</div>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-3">
-          <div class="bg-white/70 rounded-2xl p-4 border border-primary/20">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">🏙️</span>
-              <span class="text-sm font-bold text-gray-700">物质维度</span>
-              <span class="ml-auto text-primary font-bold text-sm">{{ radarScores.material }}%</span>
-            </div>
-            <p class="text-xs text-gray-500 leading-relaxed">{{ materialInterpretation }}</p>
-          </div>
-          <div class="bg-white/70 rounded-2xl p-4 border border-secondary/20">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center text-secondary">🌿</span>
-              <span class="text-sm font-bold text-gray-700">精神维度</span>
-              <span class="ml-auto text-secondary font-bold text-sm">{{ radarScores.spiritual }}%</span>
-            </div>
-            <p class="text-xs text-gray-500 leading-relaxed">{{ spiritualInterpretation }}</p>
-          </div>
-          <div class="bg-white/70 rounded-2xl p-4 border border-accent/20">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent">🔮</span>
-              <span class="text-sm font-bold text-gray-700">玄学维度</span>
-              <span class="ml-auto text-accent font-bold text-sm">{{ radarScores.xuanxue }}%</span>
-            </div>
-            <p class="text-xs text-gray-500 leading-relaxed">{{ xuanxueInterpretation }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="enhancedBazi" class="section-block-purple animate-slide-up" style="animation-delay: 0.6s">
-        <h3 class="text-lg font-display font-bold text-gray-700 mb-4 text-center">
-          <span class="inline-flex items-center gap-2">🔮 八字玄学 · 日主与城市深度分析</span>
-        </h3>
-
-        <div class="bg-white/60 rounded-2xl p-5 border border-white mb-4">
-          <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">四柱八字</h4>
-          <div class="flex justify-center gap-3 mb-4">
-            <div v-for="(stem, i) in enhancedBazi.heavenlyStems" :key="i"
-              class="flex flex-col items-center"
+          <div class="space-y-4">
+            <div v-for="(r, idx) in topResults" :key="r.city.id"
+              class="card-hover animate-reveal"
+              :class="'stagger-' + (idx + 1)"
+              @click="showCityDetail(r.city)"
             >
-              <div class="text-xs text-gray-400 mb-1">{{ ['年', '月', '日', '时'][i] }}柱</div>
-              <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold shadow-md"
-                :style="{ backgroundColor: getWuxingColor(enhancedBazi.fiveElements[i]) + '20', color: getWuxingColor(enhancedBazi.fiveElements[i]), border: '2px solid ' + getWuxingColor(enhancedBazi.fiveElements[i]) + '40' }"
-              >
-                {{ stem }}
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center text-lg font-bold shrink-0"
+                  :class="idx === 0 ? 'bg-gold text-canvas-base' : 'bg-canvas-overlay border border-border-subtle text-text-muted'"
+                >
+                  {{ idx + 1 }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <IconSprite :name="r.city.icon" size="20" />
+                    <span class="text-body text-text-primary font-bold">{{ r.city.name }}</span>
+                    <span class="tag">{{ r.city.province }}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 mt-2">
+                    <span v-for="tag in r.city.tags" :key="tag" class="tag">#{{ tag }}</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-section text-gold">{{ r.matchPercentage }}%</div>
+                  <div class="text-caption text-text-muted">匹配度</div>
+                </div>
               </div>
-              <div class="w-14 h-10 rounded-xl flex items-center justify-center text-base font-bold text-gray-500 bg-gray-50 mt-1 border border-gray-100">
-                {{ enhancedBazi.earthlyBranches[i] }}
-              </div>
-              <div class="text-xs mt-1 font-medium" :style="{ color: getWuxingColor(enhancedBazi.fiveElements[i]) }">
-                {{ enhancedBazi.fiveElements[i] }}{{ getWuxingEmoji(enhancedBazi.fiveElements[i]) }}
+              <div class="mt-4 pt-4 border-t border-border-subtle">
+                <p class="text-body text-text-body leading-relaxed">{{ r.reason }}</p>
               </div>
             </div>
           </div>
-          <div class="space-y-2 text-xs text-gray-500">
-            <p v-for="(interp, i) in enhancedBazi.pillarInterpretations" :key="i">{{ interp }}</p>
-          </div>
         </div>
 
-        <div class="bg-white/60 rounded-2xl p-5 border border-white mb-4">
-          <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">五行分布</h4>
-          <div class="space-y-2.5">
-            <div v-for="(count, elem) in enhancedBazi.elementDistribution" :key="elem" class="flex items-center gap-3">
-              <span class="w-6 text-center text-sm">{{ getWuxingEmoji(elem) }}</span>
-              <span class="w-6 text-sm font-medium" :style="{ color: getWuxingColor(elem) }">{{ elem }}</span>
-              <div class="score-bar flex-1">
-                <div class="score-bar-fill" :style="{ width: (count / 4 * 100) + '%', backgroundColor: getWuxingColor(elem) }"></div>
-              </div>
-              <span class="w-5 text-right text-xs text-gray-400">{{ count }}</span>
-            </div>
-          </div>
-          <div class="mt-3 flex items-center justify-center gap-2 text-xs text-gray-500">
-            <span>五行均衡度</span>
-            <div class="score-bar w-24">
-              <div class="score-bar-fill bg-gradient-to-r from-primary via-secondary to-accent" :style="{ width: enhancedBazi.wuxingBalanceScore + '%' }"></div>
-            </div>
-            <span class="font-medium" :style="{ color: enhancedBazi.wuxingBalanceScore > 60 ? '#4ECDC4' : '#FF6B6B' }">{{ enhancedBazi.wuxingBalanceScore }}%</span>
-          </div>
-        </div>
-
-        <div class="bg-white/60 rounded-2xl p-5 border border-white mb-4">
-          <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">
-            日主分析 · {{ enhancedBazi.dayMaster }}{{ getWuxingEmoji(enhancedBazi.dayMaster) }}
-            <span class="text-xs text-gray-400 font-normal">（与城市选择的关系）</span>
-          </h4>
-          <p class="text-xs text-gray-600 leading-relaxed mb-3">{{ enhancedBazi.dayMasterPersonality }}</p>
-
-          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200/60">
-            <p class="text-xs text-gray-600 leading-relaxed">{{ dayMasterCityAnalysis }}</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div class="bg-white/70 rounded-2xl p-4 border border-green-200/50">
-            <div class="text-xs text-gray-400 mb-1">✨ 喜用神</div>
-            <div class="flex gap-1.5">
-              <span v-for="l in enhancedBazi.likes" :key="l"
-                class="px-2.5 py-1 rounded-lg text-xs font-bold"
-                :style="{ backgroundColor: getWuxingColor(l) + '20', color: getWuxingColor(l) }"
-              >{{ l }}{{ getWuxingEmoji(l) }}</span>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">你的 Top 1 城市「{{ topResults[0]?.city.name }}」{{ cityWuxingMatchText }}</div>
-          </div>
-          <div class="bg-white/70 rounded-2xl p-4 border border-red-200/50">
-            <div class="text-xs text-gray-400 mb-1">⚠️ 忌神</div>
-            <div class="flex gap-1.5">
-              <span v-for="d in enhancedBazi.dislikes" :key="d"
-                class="px-2.5 py-1 rounded-lg text-xs font-bold"
-                :style="{ backgroundColor: getWuxingColor(d) + '15', color: getWuxingColor(d) }"
-              >{{ d }}{{ getWuxingEmoji(d) }}</span>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">需谨慎选择忌神元素过旺的城市</div>
-          </div>
-        </div>
-
-        <div class="bg-white/60 rounded-2xl p-5 border border-white mb-4">
-          <h4 class="text-sm font-bold text-gray-600 mb-3 text-center">五行生克制化 · 与城市选择的关系</h4>
-          <div v-if="enhancedBazi.wuxingRelation.shengCycles.length > 0 || enhancedBazi.wuxingRelation.keCycles.length > 0">
-            <div class="flex flex-wrap gap-2 justify-center mb-3">
-              <span v-for="s in enhancedBazi.wuxingRelation.shengCycles" :key="s"
-                class="px-3 py-1.5 rounded-full text-xs font-medium bg-green-50 text-green-600 border border-green-200"
-              >{{ s }} 🌱</span>
-              <span v-for="k in enhancedBazi.wuxingRelation.keCycles" :key="k"
-                class="px-3 py-1.5 rounded-full text-xs font-medium bg-red-50 text-red-500 border border-red-200"
-              >{{ k }} ⚡</span>
-            </div>
-            <p class="text-xs text-gray-500 mb-3 text-center">{{ enhancedBazi.wuxingRelation.summary }}</p>
-          </div>
-          <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-200/60">
-            <p class="text-xs text-gray-600 leading-relaxed">{{ wuxingCityAnalysis }}</p>
-          </div>
-        </div>
-
-        <div class="bg-white/60 rounded-2xl p-5 border border-white">
-          <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">
-            💕 夫妻宫 · {{ enhancedBazi.earthlyBranches[2] }}
-            <span class="text-xs text-gray-400 font-normal">（对城市选择的影响）</span>
-          </h4>
-          <p class="text-xs text-gray-500 mb-2">{{ enhancedBazi.detailedCouplePalace.summary }}</p>
-          <p class="text-xs text-gray-600 leading-relaxed mb-3">{{ enhancedBazi.detailedCouplePalace.detailed }}</p>
-          <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4 border border-pink-200/60">
-            <p class="text-xs text-gray-600 leading-relaxed">{{ couplePalaceCityAnalysis }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-center animate-fade-in" style="animation-delay: 0.8s">
-        <button @click="retakeTest"
-          class="py-4 px-14 glass-card-strong text-gray-600 font-bold rounded-2xl hover:border-primary hover:text-primary hover:shadow-lg transition-all duration-300 border-2 border-transparent"
-        >
-          🔁 重新测试
-        </button>
-      </div>
-
-    <div v-if="showUrlModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
-      @click.self="showUrlModal = false"
-    >
-      <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-        <div class="text-center mb-4">
-          <span class="text-3xl">🔗</span>
-          <h3 class="text-base font-bold text-gray-700 mt-2">复制链接加入小队</h3>
-          <p class="text-xs text-gray-400 mt-1">点击下方链接全选后复制，分享给好友即可加入你的小队</p>
-        </div>
-        <input
-           ref="urlInputRef"
-           :value="manualCopyUrl"
-           class="w-full px-4 py-3 bg-gray-50 rounded-2xl text-xs text-gray-600 border border-gray-200 outline-none focus:border-secondary focus:ring-1 focus:ring-secondary mb-4 select-all"
-           @focus="onUrlInputFocus"
-           @click="onUrlInputFocus"
-           readonly
-         />
-        <div class="flex gap-2">
-          <button @click="copyUrlText"
-            class="flex-1 py-2.5 bg-gradient-to-r from-secondary to-accent text-white text-sm font-bold rounded-2xl hover:shadow-md transition-all"
-          >
-            📋 复制链接
-          </button>
-          <button @click="showUrlModal = false"
-            class="py-2.5 px-5 bg-gray-100 text-gray-500 text-sm font-bold rounded-2xl hover:bg-gray-200 transition-all"
-          >
-            关闭
+        <div class="flex justify-center py-12 animate-reveal">
+          <button @click="retakeTest" class="btn-secondary px-14">
+            重新测试
           </button>
         </div>
+      </div>
+      <footer class="py-10 text-center">
+        <p class="text-fine text-text-faint tracking-widest">娱乐测评 · 仅供开心</p>
+      </footer>
+    </section>
+
+    <!-- Dot indicators -->
+    <div class="page-dots">
+      <span v-for="i in 4" :key="i" class="page-dot" :class="{ active: currentPage === i - 1 }" @click="goToPage(i - 1)"></span>
+    </div>
+  </div>
+
+  <!-- URL modal (outside scroll container) -->
+  <div v-if="showUrlModal" class="modal-overlay" @click.self="showUrlModal = false">
+    <div class="modal-content">
+      <div class="text-center mb-5">
+        <h3 class="text-caption text-text-primary font-bold mt-2 tracking-wider">复制链接加入小队</h3>
+        <p class="text-fine text-text-muted mt-1">点击下方链接全选后复制，分享给好友即可加入你的小队</p>
+      </div>
+      <input
+        ref="urlInputRef"
+        :value="manualCopyUrl"
+        class="text-input w-full mb-5 text-fine select-all"
+        @focus="onUrlInputFocus"
+        @click="onUrlInputFocus"
+        readonly
+      />
+      <div class="flex gap-2">
+        <button @click="copyUrlText" class="btn-primary flex-1 text-caption">复制链接</button>
+        <button @click="showUrlModal = false" class="btn-secondary text-caption px-5">关闭</button>
       </div>
     </div>
-
-        <div class="text-center text-xs text-gray-300 py-4">
-          © 2026 CityFit · 仅供娱乐 · 开心就好 😊
-        </div>
-      </div>
-
-      <CityDetailCard
-        :visible="detailCardVisible"
-        :city="detailCardCity"
-        :match-percentage="detailCardMatch"
-        :reason="detailCardReason"
-        @close="detailCardVisible = false"
-      />
-
-    </template>
-
   </div>
+
+  <!-- CityDetailCard (outside scroll container) -->
+  <CityDetailCard
+    :visible="detailCardVisible"
+    :city="detailCardCity"
+    :match-percentage="detailCardMatch"
+    :reason="detailCardReason"
+    @close="detailCardVisible = false"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import RadarChart from '../components/RadarChart.vue'
 import ChinaMap from '../components/ChinaMap.vue'
 import CityPersonaImage from '../components/CityPersonaImage.vue'
 import CityDetailCard from '../components/CityDetailCard.vue'
-import { getEnhancedBaziInfo, WUXING_COLORS, WUXING_EMOJI } from '../composables/useBazi'
+import IconSprite from '../components/IconSprite.vue'
+import { getEnhancedBaziInfo, WUXING_COLORS, WUXING_ICONS } from '../composables/useBazi'
 import { cities, cityPersonalities } from '../data/cities'
 import type { CityResult, SharedUserData, BaziInfo, CityPersonality, City } from '../types'
+
+// ── Page tracking ──
+const currentPage = ref(0)
+const pagesContainer = ref<HTMLElement>()
+
+function goToPage(n: number) {
+  const el = pagesContainer.value
+  if (!el) return
+  el.scrollTo({ top: n * el.clientHeight, behavior: 'smooth' })
+}
+
+function onPageScroll() {
+  const el = pagesContainer.value
+  if (!el) return
+  const pageHeight = el.clientHeight
+  const scrollTop = el.scrollTop
+  currentPage.value = Math.round(scrollTop / pageHeight)
+}
 
 const router = useRouter()
 const route = useRoute()
@@ -539,44 +546,63 @@ const detailCardCity = ref<City | null>(null)
 const detailCardMatch = ref(0)
 const detailCardReason = ref('')
 
-const store = ref(JSON.parse(sessionStorage.getItem('cityfit') || '{}'))
-const results = ref(store.value.results)
-const baziInfo = ref(results.value?.baziInfo as BaziInfo | null)
+const HUMOR_CITIES = ['beijing', 'shanghai', 'chengdu']
 
-const topResults = ref<CityResult[]>(results.value?.topResults || [])
-const personalityTag = ref(results.value?.personalityTag || '城市探索家')
-const allScores = ref<Record<string, number>>(results.value?.allScores || {})
+const store = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
+const results = store.results
+const baziInfo = results?.baziInfo as BaziInfo | null
 
-const teamId = ref(results.value?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
+const topResults = ref<CityResult[]>(results?.topResults || [])
+const personalityTag = ref(results?.personalityTag || '城市探索家')
+const allScores = ref<Record<string, number>>(results?.allScores || {})
+
+// Use pending team from localStorage (survives quiz flow), else results.teamId, else new random
+const pendingTeam = localStorage.getItem('cityfit_pending_team') || ''
+const teamId = ref(pendingTeam || results?.teamId || Math.random().toString(36).substring(2, 6).toUpperCase())
 const teamMembers = ref<{ name: string; results: { cityId: string; cityName: string; matchPercentage: number }[] }[]>([])
 const showJoinInput = ref(false)
 const joinTeamCode = ref('')
 
+// ── Remote team features: preview mode + merge banner ──
 const previewMode = ref(false)
 const showMergeBanner = ref(false)
 const pendingTeamName = ref('')
 
-function loadResults() {
-  const s = JSON.parse(sessionStorage.getItem('cityfit') || '{}')
-  store.value = s
-  results.value = s.results
-  baziInfo.value = (s.results?.baziInfo as BaziInfo) || null
-  if (s.results) {
-    topResults.value = s.results.topResults || []
-    personalityTag.value = s.results.personalityTag || '城市探索家'
-    allScores.value = s.results.allScores || {}
-    if (!s.results.teamId) {
-      s.results.teamId = teamId.value
-      sessionStorage.setItem('cityfit', JSON.stringify(s))
-    }
-  }
+if (results && !results.teamId) {
+  results.teamId = teamId.value
+  sessionStorage.setItem('cityfit', JSON.stringify(store))
 }
 
-loadResults()
+// ── Auto-join pending team if returning from quiz ──
+if (pendingTeam && results) {
+  // Clear the pending flag immediately
+  localStorage.removeItem('cityfit_pending_team')
+  // Auto-join in background
+  const myData = {
+    name: shareName.value || '我的好友',
+    private: privateMode.value,
+    teamId: pendingTeam,
+    results: topResults.value.map(r => ({
+      cityId: r.city.id,
+      cityName: r.city.name,
+      matchPercentage: r.matchPercentage,
+    })),
+  }
+  apiJoinTeam(pendingTeam, myData).then(result => {
+    if (result?.team?.members) {
+      const others = result.team.members.filter((m: any) => m.name !== myData.name)
+      if (others.length > 0) {
+        sharedFromFriend.value = others[0]
+      }
+      teamMembers.value = others.slice(1)
+      persistTeamData()
+    }
+  }).catch(() => {})
+}
 
 const enhancedBazi = computed(() => {
-  if (!baziInfo.value) return null
-  return getEnhancedBaziInfo(baziInfo.value)
+  if (!baziInfo) return null
+  return getEnhancedBaziInfo(baziInfo)
 })
 
 const personalityProfile = computed<CityPersonality | null>(() => {
@@ -588,13 +614,13 @@ const personalityProfile = computed<CityPersonality | null>(() => {
   return null
 })
 
-const personalityEmoji = computed(() => {
-  return topResults.value[0]?.city.emoji || '🏙️'
-})
-
 const personalityAssetSrc = computed(() => {
   const topCity = topResults.value[0]?.city
-  return topCity ? `${import.meta.env.BASE_URL}assets/personas/${topCity.id}.png` : ''
+  if (!topCity) return ''
+  if (HUMOR_CITIES.includes(topCity.id)) {
+    return `/assets/humor_cities_personas_images/${topCity.id}.png`
+  }
+  return `/assets/personas/${topCity.id}.png`
 })
 
 const radarScores = computed(() => {
@@ -631,38 +657,47 @@ const mapTopCities = computed(() => {
   return topResults.value.map(r => ({
     name: r.city.name,
     value: r.matchPercentage,
-    color: r === topResults.value[0] ? '#FF6B6B' : r === topResults.value[1] ? '#45B7D1' : '#96CEB4',
+    color: r === topResults.value[0] ? '#F0B90B' : r === topResults.value[1] ? '#9B9B9B' : '#6B6B6B',
   }))
+})
+
+// Detect cities that overlap between current user and team members (for map highlight)
+const mapOverlapCities = computed(() => {
+  const myCities = new Set(topResults.value.map(r => r.city.name))
+  const teamCities = new Set<string>()
+  if (sharedFromFriend.value) {
+    sharedFromFriend.value.results.forEach(r => teamCities.add(r.cityName))
+  }
+  teamMembers.value.forEach(m => {
+    m.results.forEach(r => teamCities.add(r.cityName))
+  })
+  const overlap = new Set([...myCities].filter(c => teamCities.has(c)))
+  // Return as map points with highlight styling
+  return [...overlap].map(name => ({ name, value: 100 }))
 })
 
 const mapMergedPoints = computed(() => {
   const points: { name: string; value: number }[] = []
+
+  // Friend who shared the link (banner user)
+  if (sharedFromFriend.value) {
+    sharedFromFriend.value.results.forEach(r => {
+      const city = cities.find(c => c.id === r.cityId)
+      if (city) points.push({ name: city.name, value: r.matchPercentage })
+    })
+  }
+
+  // Other team members
   teamMembers.value.forEach(m => {
     m.results.forEach(r => {
       const city = cities.find(c => c.id === r.cityId)
-      if (city) {
-        points.push({ name: city.name, value: r.matchPercentage })
-      }
+      if (city) points.push({ name: city.name, value: r.matchPercentage })
     })
   })
   return points
 })
 
 const sharedFromFriend = ref<SharedUserData | null>(null)
-
-const previewFriendCities = computed(() => {
-  if (!sharedFromFriend.value) return []
-  return sharedFromFriend.value.results
-})
-
-const previewMapCities = computed(() => {
-  if (!sharedFromFriend.value) return []
-  return sharedFromFriend.value.results.map((r, idx) => ({
-    name: r.cityName,
-    value: r.matchPercentage,
-    color: idx === 0 ? '#FF6B6B' : idx === 1 ? '#45B7D1' : '#96CEB4',
-  }))
-})
 
 const dayMasterCityAnalysis = computed(() => {
   const bazi = enhancedBazi.value
@@ -672,12 +707,12 @@ const dayMasterCityAnalysis = computed(() => {
   const cityPrefs = city.baziPreference
   const matchCount = cityPrefs.filter(e => bazi.likes.includes(e)).length
   if (matchCount >= 2) {
-    return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，而你的本命城市「${city.name}」的五行偏好（${cityPrefs.join('、')}）与你的喜用神（${bazi.likes.join('、')}）高度匹配！这表明${city.name}的气场对你的八字有正向的加持作用，居住或常去这座城市会对你的整体运势产生积极影响。你的${dayWuxing}性人格特质也能在这座城市得到最好的发挥和释放。`
+    return `你的日主为${dayWuxing}，而你的本命城市「${city.name}」的五行偏好（${cityPrefs.join('、')}）与你的喜用神（${bazi.likes.join('、')}）高度匹配！这表明${city.name}的气场对你的八字有正向的加持作用，居住或常去这座城市会对你的整体运势产生积极影响。你的${dayWuxing}性人格特质也能在这座城市得到最好的发挥和释放。`
   }
   if (matchCount === 1) {
-    return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，「${city.name}」的五行偏好中包含你的喜用神${cityPrefs.filter(e => bazi.likes.includes(e)).join('、')}，有一定的正向作用。同时这座城市也有其他元素特质，整体来说是一个不错的选择。`
+    return `你的日主为${dayWuxing}，「${city.name}」的五行偏好中包含你的喜用神${cityPrefs.filter(e => bazi.likes.includes(e)).join('、')}，有一定的正向作用。同时这座城市也有其他元素特质，整体来说是一个不错的选择。`
   }
-  return `你的日主为${dayWuxing}${getWuxingEmoji(dayWuxing)}，「${city.name}」的五行偏好与你的喜用神匹配度不高，但这并不意味着不合适。城市的选择是多维度的，物质和精神层面的契合同样重要。建议你多关注下文其他维度的分析。`
+    return `你的日主为${dayWuxing}，「${city.name}」的五行偏好与你的喜用神匹配度不高，但这并不意味着不合适。城市的选择是多维度的，物质和精神层面的契合同样重要。建议你多关注下文其他维度的分析。`
 })
 
 const cityWuxingMatchText = computed(() => {
@@ -686,7 +721,7 @@ const cityWuxingMatchText = computed(() => {
   if (!city || !bazi) return ''
   const matched = city.baziPreference.filter(e => bazi.likes.includes(e))
   const unmatched = city.baziPreference.filter(e => bazi.dislikes.includes(e))
-  if (matched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）与喜用神（${matched.join('、')}）相合 ✨`
+  if (matched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）与喜用神（${matched.join('、')}）相合`
   if (unmatched.length > 0) return `的五行偏好（${city.baziPreference.join('、')}）包含忌神元素，建议综合考量`
   return '的五行属性较为中性'
 })
@@ -724,8 +759,40 @@ function getWuxingColor(wuxing: string): string {
   return WUXING_COLORS[wuxing] || '#9CA3AF'
 }
 
-function getWuxingEmoji(wuxing: string): string {
-  return WUXING_EMOJI[wuxing] || '✨'
+function getWuxingIcon(wuxing: string): string {
+  return WUXING_ICONS[wuxing] || 'sparkles'
+}
+
+// ── Team Backend API ──
+const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8765' : ''
+
+async function apiCreateTeam(code: string, member: object): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/teams`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, member })
+  })
+  const data = await res.json()
+  if (!res.ok && res.status !== 409) throw new Error(data.error || 'API error')
+  return data.code || code
+}
+
+async function apiJoinTeam(code: string, member: object): Promise<{ members: any[] }> {
+  const res = await fetch(`${API_BASE}/api/teams/${code}/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ member })
+  })
+  if (!res.ok) throw new Error('Failed to join team')
+  return res.json()
+}
+
+async function apiGetTeam(code: string): Promise<{ members: any[] } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/teams/${code}`)
+    if (!res.ok) return null
+    return res.json()
+  } catch { return null }
 }
 
 const ZHI_WUXING_MAP: Record<string, string> = {
@@ -756,16 +823,43 @@ function generateShareLink(): string {
       matchPercentage: r.matchPercentage,
     })),
   }
-  const currentTeamData = teamMembers.value.map(m => ({
-    name: m.name,
-    private: false,
-    teamId: teamId.value,
-    results: m.results,
-  }))
-  const allData = [data, ...currentTeamData]
-  const encoded = btoa(encodeURIComponent(JSON.stringify(allData)))
-  const shareUrl = `${window.location.origin}${window.location.pathname}#/result?team=${teamId.value}&data=${encoded}`
+  // Also post to backend (fire-and-forget in background)
+  apiCreateTeam(teamId.value, data).catch(() => {})
+  
+  const shareUrl = `${window.location.origin}${window.location.pathname}?team=${teamId.value}`
   return shareUrl
+}
+
+// --- Team data persistence (localStorage) ---
+const TEAM_STORAGE_KEY = 'cityfit_team'
+
+function persistTeamData() {
+  const data = {
+    teamId: teamId.value,
+    teamMembers: teamMembers.value,
+    sharedFromFriendName: sharedFromFriend.value?.name || null,
+    sharedFromFriendPrivate: sharedFromFriend.value?.private ?? null,
+    sharedFromFriendResults: sharedFromFriend.value?.results || null,
+  }
+  localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(data))
+}
+
+function loadTeamData() {
+  try {
+    const stored = localStorage.getItem(TEAM_STORAGE_KEY)
+    if (!stored) return
+    const data = JSON.parse(stored)
+    if (data.teamId) teamId.value = data.teamId
+    if (data.teamMembers?.length) teamMembers.value = data.teamMembers
+    if (data.sharedFromFriendName) {
+      sharedFromFriend.value = {
+        name: data.sharedFromFriendName,
+        private: data.sharedFromFriendPrivate || false,
+        teamId: data.teamId || '',
+        results: data.sharedFromFriendResults || [],
+      }
+    }
+  } catch { /* ignore corrupt localStorage */ }
 }
 
 const copyStatus = ref<'idle' | 'copied' | 'error'>('idle')
@@ -791,6 +885,7 @@ function copyUrlText() {
 }
 
 async function copyTeamLink() {
+  persistTeamData()
   const url = generateShareLink()
   copyStatus.value = 'idle'
 
@@ -830,29 +925,108 @@ async function copyTeamLink() {
   setTimeout(() => { copyStatus.value = 'idle' }, 2500)
 }
 
-function joinTeam() {
-  if (!joinTeamCode.value.trim()) {
-    alert('请输入小队码')
+async function joinTeam() {
+  const input = joinTeamCode.value.trim()
+  if (!input) {
+    alert('请输入小队码或分享链接')
     return
   }
-  const code = joinTeamCode.value.trim().toUpperCase()
-  teamId.value = code
-  if (results.value) {
-    results.value.teamId = code
-    store.value.results = results.value
-    sessionStorage.setItem('cityfit', JSON.stringify(store.value))
+
+  let code = input.toUpperCase()
+
+  // Try to parse as a full share URL (extract team code)
+  try {
+    const url = new URL(input)
+    const teamParam = url.searchParams.get('team')
+    if (teamParam) code = teamParam
+  } catch {
+    // Not a URL, treat as plain team code
   }
+
+  // Set team ID
+  teamId.value = code
+  if (results) {
+    results.teamId = code
+    store.results = results
+    sessionStorage.setItem('cityfit', JSON.stringify(store))
+  }
+
+  // Post this user's results to backend
+  const myData = {
+    name: privateMode.value ? '匿名用户' : (shareName.value || '我的好友'),
+    private: privateMode.value,
+    teamId: code,
+    results: topResults.value.map(r => ({
+      cityId: r.city.id,
+      cityName: r.city.name,
+      matchPercentage: r.matchPercentage,
+    })),
+  }
+
+  try {
+    const result = await apiJoinTeam(code, myData)
+    // Update team members from backend response
+    if (result.team?.members) {
+      const others = result.team.members.filter((m: any) => m.name !== myData.name)
+      if (others.length > 0) {
+        sharedFromFriend.value = others[0]
+      }
+      teamMembers.value = others.slice(1)
+    }
+  } catch {
+    // Backend unavailable, fall through to URL-based
+  }
+
+  persistTeamData()
   showJoinInput.value = false
   joinTeamCode.value = ''
-  alert(`✅ 已加入小队「${code}」！对方的小队链接中将包含你的数据`)
+
+  const newUrl = generateShareLink()
+  manualCopyUrl.value = newUrl
+  showUrlModal.value = true
 }
 
-function retakeTest() {
-  sessionStorage.removeItem('cityfit')
-  router.push('/')
+function acceptJoinTeam() {
+  showMergeBanner.value = false
+  const pending = sessionStorage.getItem('cityfit_pending_invite')
+  if (pending) {
+    try {
+      const invite = JSON.parse(pending)
+      if (invite.friendData) {
+        sharedFromFriend.value = invite.friendData
+      }
+      if (invite.membersData?.length) {
+        teamMembers.value = invite.membersData
+      }
+      if (invite.teamId) {
+        teamId.value = invite.teamId
+      }
+      sessionStorage.removeItem('cityfit_pending_invite')
+      persistTeamData()
+      // Also post to backend
+      const myData = {
+        name: privateMode.value ? '匿名用户' : (shareName.value || '我的好友'),
+        private: privateMode.value,
+        teamId: invite.teamId,
+        results: topResults.value.map(r => ({
+          cityId: r.city.id, cityName: r.city.name, matchPercentage: r.matchPercentage,
+        })),
+      }
+      apiCreateTeam(invite.teamId, myData).catch(() => {})
+    } catch {
+      sessionStorage.removeItem('cityfit_pending_invite')
+    }
+  }
 }
 
+function declineJoinTeam() {
+  showMergeBanner.value = false
+  sessionStorage.removeItem('cityfit_pending_invite')
+}
+
+// Save pending invite before navigating to quiz (called from preview mode)
 function goTakeTest() {
+  previewMode.value = false
   const invite = {
     teamId: teamId.value,
     fromName: sharedFromFriend.value?.private ? '匿名好友' : (sharedFromFriend.value?.name || '好友'),
@@ -865,86 +1039,138 @@ function goTakeTest() {
     })),
   }
   sessionStorage.setItem('cityfit_pending_invite', JSON.stringify(invite))
+  localStorage.setItem('cityfit_pending_team', teamId.value)
   router.push('/info')
 }
 
-function acceptJoinTeam() {
-  showMergeBanner.value = false
-  const pending = sessionStorage.getItem('cityfit_pending_invite')
-  if (pending) {
-    try {
-      const invite = JSON.parse(pending)
-      teamId.value = invite.teamId
-      if (invite.friendData) {
-        sharedFromFriend.value = invite.friendData
-      }
-      if (invite.membersData && invite.membersData.length > 0) {
-        teamMembers.value = invite.membersData
-      }
-      if (results.value) {
-        results.value.teamId = invite.teamId
-        store.value.results = results.value
-        sessionStorage.setItem('cityfit', JSON.stringify(store.value))
-      }
-    } catch {}
-  }
-  sessionStorage.removeItem('cityfit_pending_invite')
-}
-
-function declineJoinTeam() {
-  showMergeBanner.value = false
-  sessionStorage.removeItem('cityfit_pending_invite')
+function retakeTest() {
+  sessionStorage.removeItem('cityfit')
+  router.push('/')
 }
 
 onMounted(() => {
-  loadResults()
-
-  const dataParam = route.query.data as string
-  const teamParam = route.query.team as string
-
-  if (dataParam && teamParam) {
-    try {
-      const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
-      if (Array.isArray(decoded)) {
-        const members = decoded as SharedUserData[]
-        if (members.length > 0) {
-          sharedFromFriend.value = members[0]
-          teamId.value = teamParam
-          teamMembers.value = members.map(m => ({
-            name: m.name,
-            results: m.results,
-          }))
-        }
-      }
-    } catch {
-      console.warn('Failed to parse team data')
-    }
-  }
-
-  if (!results.value) {
-    if (sharedFromFriend.value) {
+  if (!results) {
+    // Preview mode: visitor from shared link, no test results yet
+    const teamParam = route.query.team as string
+    const dataParam = route.query.data as string
+    if (teamParam && dataParam) {
       previewMode.value = true
+      teamId.value = teamParam
+      localStorage.setItem('cityfit_pending_team', teamParam)
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
+        if (Array.isArray(decoded) && decoded.length > 0) {
+          sharedFromFriend.value = decoded[0] as SharedUserData
+          if (decoded.length > 1) teamMembers.value = decoded.slice(1)
+        }
+      } catch { /* ignore */ }
       return
     }
     router.push('/')
     return
   }
 
-  const pending = sessionStorage.getItem('cityfit_pending_invite')
-  if (pending) {
+  // Restore team data from localStorage
+  loadTeamData()
+
+  // Check for pending invite (from quiz flow after visiting shared link)
+  const pendingInvite = sessionStorage.getItem('cityfit_pending_invite')
+  if (pendingInvite) {
     try {
-      const invite = JSON.parse(pending)
-      pendingTeamName.value = invite.fromName
-      if (invite.friendData) {
-        sharedFromFriend.value = invite.friendData
-      }
-      if (invite.membersData && invite.membersData.length > 0) {
-        teamMembers.value = invite.membersData
-      }
+      const invite = JSON.parse(pendingInvite)
+      pendingTeamName.value = invite.fromName || '好友'
+      if (invite.friendData) sharedFromFriend.value = invite.friendData
+      if (invite.membersData?.length) teamMembers.value = invite.membersData
+      if (invite.teamId) teamId.value = invite.teamId
       showMergeBanner.value = true
+      persistTeamData()
     } catch {
       sessionStorage.removeItem('cityfit_pending_invite')
     }
   }
+
+  const teamParam = route.query.team as string
+  if (teamParam) {
+    teamId.value = teamParam
+    localStorage.setItem('cityfit_pending_team', teamParam)
+    apiGetTeam(teamParam).then(result => {
+      if (result?.team?.members) {
+        const members = result.team.members
+        if (members.length > 0) sharedFromFriend.value = members[0]
+        if (members.length > 1) teamMembers.value = members.slice(1)
+        persistTeamData()
+      }
+    }).catch(() => {})
+
+    const dataParam = route.query.data as string
+    if (dataParam) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(dataParam)))
+        if (Array.isArray(decoded) && decoded.length > 0) {
+          if (!sharedFromFriend.value) sharedFromFriend.value = decoded[0] as SharedUserData
+          if (decoded.length > 1 && teamMembers.value.length === 0) teamMembers.value = decoded.slice(1)
+          persistTeamData()
+        }
+      } catch { /* ignore */ }
+    }
+  }
+
+  // ── Page tracking setup ──
+  pagesContainer.value = document.querySelector('.result-pages') as HTMLElement
+  pagesContainer.value?.addEventListener('scroll', onPageScroll, { passive: true })
+})
+
+onUnmounted(() => {
+  pagesContainer.value?.removeEventListener('scroll', onPageScroll)
 })
 </script>
+
+<style scoped>
+.result-pages {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.result-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.page-inner {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem);
+  overflow-y: auto;
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+.page-dots {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  gap: 10px;
+}
+.page-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(240,185,11,0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.page-dot.active {
+  background: rgba(240,185,11,0.85);
+  box-shadow: 0 0 8px rgba(240,185,11,0.4);
+  transform: scale(1.3);
+}
+</style>

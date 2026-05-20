@@ -8,7 +8,7 @@
         @error="onError"
       />
       <div v-if="error" class="fallback">
-        <span class="fallback-emoji">{{ emoji }}</span>
+        <IconSprite :name="emoji" size="36" />
         <span class="fallback-label" :style="{ color }">{{ tag }}</span>
       </div>
     </div>
@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import IconSprite from './IconSprite.vue'
 
 const props = defineProps<{
   assetSrc: string
@@ -49,16 +50,13 @@ function onError() {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 20px;
   overflow: hidden;
-  background: #f8f9fa;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #16161a;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .persona-frame:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .persona-image {
@@ -75,7 +73,7 @@ function onError() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  background: linear-gradient(135deg, #16161a, #111114);
   gap: 8px;
 }
 
@@ -86,7 +84,7 @@ function onError() {
 
 .fallback-label {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .persona-meta {
@@ -100,13 +98,13 @@ function onError() {
 .persona-city {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #FFFFFF;
   white-space: nowrap;
 }
 
 .persona-tag {
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 2px 8px;
   border-radius: 999px;
   border: 1.5px solid;
