@@ -126,7 +126,8 @@
     </section>
 
     <!-- ===== Page 2: 八字玄学 ===== -->
-    <section class="result-page" data-page="1">
+    <section class="result-page !justify-start" data-page="1">
+      <!-- Page 2: 八字玄学 -->
       <div class="page-inner">
         <div v-if="enhancedBazi">
           <h3 class="font-display text-section text-text-primary mb-10 text-center animate-reveal">八字玄学 · 日主与城市深度分析</h3>
@@ -238,7 +239,8 @@
     </section>
 
     <!-- ===== Page 3: 三维城市画像 ===== -->
-    <section class="result-page" data-page="2">
+    <section class="result-page !justify-start" data-page="2">
+      <!-- Page 3: 三维城市画像 -->
       <div class="page-inner">
         <div>
           <h3 class="font-display text-section text-text-primary mb-10 text-center animate-reveal">三维城市画像 · 专业解读</h3>
@@ -292,7 +294,8 @@
     </section>
 
     <!-- ===== Page 4: 组队 + Top3 ===== -->
-    <section class="result-page" data-page="3">
+    <section class="result-page !justify-start" data-page="3">
+      <!-- Page 4: 组队 + Top3 -->
       <div class="page-inner">
         <div>
           <h3 class="font-display text-section text-text-primary mb-2 text-center animate-reveal">点亮中国地图</h3>
