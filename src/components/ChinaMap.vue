@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full rounded-2xl overflow-hidden relative"
+  <div class="w-full h-full rounded-2xl overflow-hidden relative"
     style="background: transparent">
     
     <div class="absolute top-3 left-4 z-10 flex items-center gap-2">
