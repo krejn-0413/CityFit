@@ -1,7 +1,7 @@
 <template>
   <div class="result-pages">
     <!-- ===== Page 1: 城市人格 ===== -->
-    <section class="result-page" data-page="0">
+    <section class="result-page" :class="{ '!justify-start': previewMode }" data-page="0">
       <div class="page-inner">
         <!-- Preview mode: visitor without test results -->
         <template v-if="previewMode">
