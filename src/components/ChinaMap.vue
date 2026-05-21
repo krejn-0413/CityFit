@@ -22,70 +22,79 @@
       </button>
     </div>
 
-    <div v-show="mapState === 'ready'" class="relative flex items-center justify-center w-full h-full">
-      <div ref="mapContainerRef" class="relative w-full h-full flex items-center justify-center">
+    <!-- ===== Main map + marker layer: always rendered (opacity hidden until ready) ===== -->
+    <div
+      ref="outerRef"
+      class="w-full h-full flex items-center justify-center"
+      :class="mapState === 'ready' ? '' : 'invisible'"
+    >
+      <!-- Inner container: aspect-ratio locked to SVG native dimensions (4177:3578).
+           Image and markers share this container → they scale together as one unit.
+           Rendered unconditionally so @load fires; visibility gated by outer div. -->
+      <div
+        class="relative shrink-0"
+        :style="{ width: (containerSize.width || 1) + 'px', height: (containerSize.height || 1) + 'px' }"
+      >
         <img
+          ref="mapImgRef"
           :src="mapSvgUrl"
           alt="中国地图"
-          class="max-w-full max-h-full block object-contain"
+          class="absolute inset-0 w-full h-full block"
           @load="onMapLoaded"
           @error="onMapError"
         />
 
-        <div v-for="point in allPoints" :key="point.name + point.source"
-          class="absolute cursor-pointer group"
-          :class="point.rank <= 3 ? 'transform -translate-x-1/2 -translate-y-full' : 'transform -translate-x-1/2 -translate-y-1/2'"
-          :style="{ left: point.x + '%', top: point.y + '%' }"
-          @click="emit('cityClick', point.name)"
-          @mouseenter="hoveredCity = point.name"
-          @mouseleave="hoveredCity = null"
-        >
-          <div class="relative flex items-center justify-center">
-            <div v-if="point.rank === 1" class="absolute w-12 h-12 rounded-full animate-ping"
-              style="left: 50%; top: 60%; transform: translate(-50%, -50%)"
+        <!-- Marker layer: exactly overlays the image -->
+        <div class="absolute inset-0">
+          <div v-for="point in allPoints" :key="point.name + point.source"
+            class="absolute cursor-pointer group"
+            :style="{ left: point.x + '%', top: point.y + '%' }"
+            @click="emit('cityClick', point.name)"
+            @mouseenter="hoveredCity = point.name"
+            @mouseleave="hoveredCity = null"
+          >
+            <div v-if="point.rank === 1" class="absolute rounded-full animate-ping"
+              style="left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem"
               :style="{ backgroundColor: point.color + '25' }"></div>
-            <div v-if="point.rank === 1" class="absolute w-9 h-9 rounded-full animate-pulse"
-              style="left: 50%; top: 60%; transform: translate(-50%, -50%)"
+            <div v-if="point.rank === 1" class="absolute rounded-full animate-pulse"
+              style="left: 50%; top: 50%; transform: translate(-50%, -50%); width: 2.25rem; height: 2.25rem"
               :style="{ backgroundColor: point.color + '15' }"></div>
 
-            <img v-if="point.rank <= 3"
-              :src="`${baseUrl}assets/flag${point.rank}.svg`"
-              class="relative z-10 transition-transform duration-200 group-hover:scale-110"
-              :class="point.rank === 1 ? 'w-8 h-8' : point.rank === 2 ? 'w-7 h-7' : 'w-6 h-6'"
-            />
-            <div v-else-if="point.isOverlap"
-              class="relative z-10 flex items-center justify-center rounded-full shadow transition-transform duration-200 group-hover:scale-125 w-4 h-4 border-2 border-dashed"
-              :style="{ borderColor: '#F0B90B', boxShadow: '0 0 12px rgba(240,185,11,0.4)' }">
-              <span class="text-[8px] text-gold font-bold">✦</span>
+            <div
+              class="pin-drop"
+              :class="{ 'pin-glow': point.isOverlap }"
+              :style="{ animationDelay: point.staggerIndex * 0.05 + 's' }"
+            >
+              <img
+                :src="`${baseUrl}assets/pos_pin.svg`"
+                class="transition-transform duration-200 group-hover:scale-110"
+                :style="{ width: point.pinSize + 'rem', height: point.pinSize + 'rem' }"
+              />
             </div>
-            <div v-else
-              class="relative z-10 flex items-center justify-center rounded-full shadow transition-transform duration-200 group-hover:scale-125 w-3 h-3"
-              :style="{ backgroundColor: point.color }">
-            </div>
-          </div>
 
-          <div v-if="point.rank <= 3 || point.isOverlap || hoveredCity === point.name"
-            class="absolute left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-md text-[10px] font-medium pointer-events-none transition-opacity"
-            :class="point.isOverlap ? 'top-9' : point.rank === 1 ? 'top-9' : point.rank === 2 ? 'top-8' : 'top-7'"
-            :style="{
-              backgroundColor: point.isOverlap ? '#F0B90B' : point.rank === 1 ? point.color : 'rgba(255,255,255,0.9)',
-              color: (point.isOverlap || point.rank === 1) ? '#0a0a0c' : '#374151',
-              boxShadow: point.isOverlap ? '0 0 10px rgba(240,185,11,0.5)' : '0 1px 4px rgba(0,0,0,0.15)'
-            }">
-            {{ point.isOverlap ? '✦ ' : '' }}{{ point.name }} {{ point.value }}%
+            <div v-if="point.rank <= 3 || point.isOverlap || hoveredCity === point.name"
+              class="absolute left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-md text-[10px] font-medium pointer-events-none transition-opacity z-20"
+              :style="{
+                top: (point.pinSize * 16 + 4) + 'px',
+                backgroundColor: point.isOverlap ? '#F0B90B' : point.rank === 1 ? point.color : 'rgba(255,255,255,0.9)',
+                color: (point.isOverlap || point.rank === 1) ? '#0a0a0c' : '#374151',
+                boxShadow: point.isOverlap ? '0 0 10px rgba(240,185,11,0.5)' : '0 1px 4px rgba(0,0,0,0.15)'
+              }">
+              {{ point.isOverlap ? '✦ ' : '' }}{{ point.name }} {{ point.value }}%
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div v-if="hoveredCity" class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-2 rounded-lg pointer-events-none">
-        点击「{{ hoveredCity }}」查看详情
-      </div>
+    <div v-if="hoveredCity" class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-2 rounded-lg pointer-events-none z-10">
+      点击「{{ hoveredCity }}」查看详情
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 
 const props = defineProps<{
   topCities: { name: string; value: number; color?: string }[]
@@ -105,6 +114,41 @@ const hoveredCity = ref<string | null>(null)
 const baseUrl = import.meta.env.BASE_URL
 const mapSvgUrl = baseUrl + 'assets/converteverything.io-d4Bqj5E6b3.svg'
 
+// ── Adaptive scaling container ──
+const outerRef = ref<HTMLElement | null>(null)
+const mapImgRef = ref<HTMLImageElement | null>(null)
+
+const SVG_W = 4177
+const SVG_H = 3578
+const SVG_RATIO = SVG_W / SVG_H
+const GRID = 20
+const PIN_MIN_REM = 1.25
+const PIN_MAX_REM = 2.5
+
+const containerSize = ref({ width: 0, height: 0 })
+
+function computeContainerSize() {
+  const el = outerRef.value
+  if (!el) return
+  const availW = el.clientWidth
+  const availH = el.clientHeight
+  if (availW <= 0 || availH <= 0) return
+
+  let w: number, h: number
+  if (availW / availH > SVG_RATIO) {
+    // Available space wider than map → constrained by height
+    h = availH
+    w = h * SVG_RATIO
+  } else {
+    // Available space taller than map → constrained by width
+    w = availW
+    h = w / SVG_RATIO
+  }
+  containerSize.value = { width: Math.floor(w), height: Math.floor(h) }
+}
+
+let resizeObserver: ResizeObserver | null = null
+
 const mergedPointsLength = computed(() => props.mergedPoints?.length || 0)
 
 const cityEmojiMap: Record<string, string> = {
@@ -117,6 +161,7 @@ const cityEmojiMap: Record<string, string> = {
   '南昌': '🏗️', '合肥': '🔬',
 }
 
+// Original coordinates from pre-scaling version (commit 1a48d56).
 const cityCoordMap: Record<string, [number, number]> = {
   '成都': [92, 89], '上海': [173, 113], '北京': [153, 69],
   '杭州': [169, 118], '深圳': [147, 154], '重庆': [119, 120],
@@ -131,15 +176,15 @@ const cityCoordMap: Record<string, [number, number]> = {
   '南京': [163, 114], '三亚': [129, 171], '广州': [139, 156],
 }
 
-const GRID = 20
-const SVG_W = 4177
-const SVG_H = 3578
-
 function gridToPercent(col: number, row: number): { x: number; y: number } {
   return {
     x: (col * GRID / SVG_W) * 100,
     y: (row * GRID / SVG_H) * 100,
   }
+}
+
+function pinSizeFromValue(value: number): number {
+  return PIN_MIN_REM + (value / 100) * (PIN_MAX_REM - PIN_MIN_REM)
 }
 
 interface MapPoint {
@@ -152,6 +197,8 @@ interface MapPoint {
   y: number
   source: string
   isOverlap?: boolean
+  staggerIndex: number
+  pinSize: number
 }
 
 const allPoints = computed<MapPoint[]>(() => {
@@ -171,6 +218,9 @@ const allPoints = computed<MapPoint[]>(() => {
       x: pos.x,
       y: pos.y,
       source: 'top',
+      isOverlap: false,
+      staggerIndex: points.length,
+      pinSize: pinSizeFromValue(c.value),
     })
   })
 
@@ -188,11 +238,12 @@ const allPoints = computed<MapPoint[]>(() => {
       x: pos.x,
       y: pos.y,
       source: 'merged',
+      isOverlap: false,
+      staggerIndex: points.length,
+      pinSize: pinSizeFromValue(p.value),
     })
   })
 
-  // Overlap cities: marked with special highlight (gold ring + ✦ label)
-  const overlapNames = new Set((props.overlapCities || []).map(c => c.name))
   ;(props.overlapCities || []).forEach(c => {
     const coord = cityCoordMap[c.name]
     if (!coord) return
@@ -205,8 +256,10 @@ const allPoints = computed<MapPoint[]>(() => {
       emoji: '',
       x: pos.x,
       y: pos.y,
-      source: 'top',
+      source: 'overlap',
       isOverlap: true,
+      staggerIndex: points.length,
+      pinSize: pinSizeFromValue(c.value),
     })
   })
 
@@ -214,7 +267,12 @@ const allPoints = computed<MapPoint[]>(() => {
 })
 
 function onMapLoaded() {
-  mapState.value = 'ready'
+  // Image is now in DOM; ensure we have a ResizeObserver for responsive updates.
+  // Initial size was already computed in onMounted before the container became visible.
+  if (outerRef.value && !resizeObserver) {
+    resizeObserver = new ResizeObserver(() => computeContainerSize())
+    resizeObserver.observe(outerRef.value)
+  }
 }
 
 function onMapError() {
@@ -222,10 +280,36 @@ function onMapError() {
   errorMessage.value = '地图图片加载失败'
 }
 
+// Trigger initial size computation early (before container becomes visible)
+// to avoid 1px flash and the deadlock where v-if blocked <img> rendering.
+function initContainerSize() {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      computeContainerSize()
+      if (outerRef.value && !resizeObserver) {
+        resizeObserver = new ResizeObserver(() => computeContainerSize())
+        resizeObserver.observe(outerRef.value)
+      }
+    })
+  })
+}
+
 onMounted(() => {
+  // Compute size immediately (outer div is in DOM, dimensions are valid even with invisible)
+  initContainerSize()
+
   const img = new Image()
-  img.onload = () => { if (mapState.value === 'loading') mapState.value = 'ready' }
+  img.onload = () => {
+    if (mapState.value === 'loading') {
+      mapState.value = 'ready'
+    }
+  }
   img.onerror = () => { mapState.value = 'error'; errorMessage.value = '地图图片加载失败' }
   img.src = mapSvgUrl
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
 })
 </script>
